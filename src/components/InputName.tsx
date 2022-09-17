@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { GameContext } from '../App'
 
-const InputName = ({ setPlayerName }: { setPlayerName: any }) => {
+const InputName = () => {
+  const { gameData, setGameData } = useContext(GameContext)
   const [name, setName] = useState('')
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter' && name.trim().length !== 0) {
       setPlayerName(name)
     }
+  }
+
+  // Set Name
+  const setPlayerName = (name: string) => {
+    console.log('client: setPlayerName ::')
+    setGameData((prevGameData: any) => {
+      return {
+        ...prevGameData,
+        playerName: name,
+      }
+    })
   }
 
   return (
