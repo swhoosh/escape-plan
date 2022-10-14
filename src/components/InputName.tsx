@@ -13,7 +13,7 @@ const InputName = () => {
 
   // Set Name
   const setPlayerName = (name: string) => {
-    console.log('client: setPlayerName ::')
+    console.log('[CLIENT] setPlayerName ::')
     setGameData((prevGameData: any) => {
       return {
         ...prevGameData,
