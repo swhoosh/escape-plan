@@ -1,6 +1,6 @@
 // run : npm run start
 
-import { generateBoard, getRandomInt } from './gameLogic.js'
+import { generateBoard, generateEntityPos, getRandomInt } from './gameLogic.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
@@ -35,12 +35,12 @@ const n_sockets_in_room = (roomID) => {
 }
 
 const fetch_sockets_in_room = async (roomID) => {
-  const sockets_arar = []
+  const sockets_arr = []
   const sockets = await io.in(roomID).fetchSockets()
   sockets.forEach((socket) => {
-    sockets_arar.push(socket.id)
+    sockets_arr.push(socket.id)
   })
-  return sockets_arar
+  return sockets_arr
 }
 
 const update_rooms = async (roomID) => {
@@ -53,15 +53,24 @@ const update_rooms = async (roomID) => {
   rooms.set(roomID, roomData)
 }
 
-const generate_gameData = async (roomID) => {
+const generate_gameData = (roomID) => {
   const roomData = rooms.get(roomID)
-  const board = await generateBoard()
-  const playerIndex = await getRandomInt(1)
+  const board = generateBoard() // generate tiles
+  const warder_pos = generateEntityPos(board)
+  board[warder_pos[1]][warder_pos[0]] = 3 // place warder on board
+  const prison_pos = generateEntityPos(board)
+  board[prison_pos[1]][prison_pos[0]] = 4 // place warder on board
+  const playerIndex = getRandomInt(1) // select player to be warder
+
   const gameData = {
     ...roomData,
     board: board,
     warder: playerIndex,
+    warder_pos: warder_pos,
+    prisoner: 1 - playerIndex,
+    prison_pos: prison_pos,
     turn: playerIndex,
+    // add score
   }
   rooms.set(roomID, gameData)
 
@@ -76,7 +85,7 @@ io.on('connection', (socket) => {
 
   // SERVER LISTENER
   // join room
-  socket.on('join_room', async (roomID) => {
+  socket.on('join_room', async (roomID, playerName) => {
     let n = n_sockets_in_room(roomID)
     if (n >= 2) {
       socket.emit('room_full')

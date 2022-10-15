@@ -13,9 +13,9 @@ export const GameContext = createContext<any>({})
 const App = () => {
   // global state: gameData
   const [gameData, setGameData] = useState({
-    playerName: '',
     // connect to server
     socket: io('http://localhost:6050'),
+    playerName: '',
     roomID: '',
     playing: false,
     board: null,

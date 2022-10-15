@@ -9,18 +9,51 @@ const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
     4 : prisoner
 */
 export const generateBoard = () => {
-  var board = createArray(grid_size)
-
+  let board = createArray(grid_size)
+  board = generateObstacle(board)
+  board = generateTiles(board, 2) // generate tunnel
   return board
 }
 
-export const createArray = (size) => {
-  var arr = new Array(size)
+const generateObstacle = (board) => {
+  let n = 0
+  while (n < max_obstacle) {
+    let x = getRandomInt(grid_size - 1)
+    let y = getRandomInt(grid_size - 1)
+    if (board[y][x] !== 1) {
+      board[y][x] = 1
+      n++
+    }
+  }
+  return board
+}
 
-  for (var i = 0; i < arr.length; i++) {
+const generateTiles = (board, tiles_type) => {
+  while (true) {
+    let x = getRandomInt(grid_size - 1)
+    let y = getRandomInt(grid_size - 1)
+    if (board[y][x] === 0) {
+      board[y][x] = tiles_type
+      return board
+    }
+  }
+}
+
+export const generateEntityPos = (board) => {
+  while (true) {
+    let x = getRandomInt(grid_size - 1)
+    let y = getRandomInt(grid_size - 1)
+    if (board[y][x] === 0) {
+      return [x, y]
+    }
+  }
+}
+
+export const createArray = (size) => {
+  let arr = new Array(size)
+  for (let i = 0; i < arr.length; i++) {
     arr[i] = new Array(size).fill(0)
   }
-
   return arr
 }
 
