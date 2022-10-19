@@ -17,7 +17,7 @@ const InputName = () => {
     setGameData((prevGameData: any) => {
       return {
         ...prevGameData,
-        playerName: name,
+        name: name,
       }
     })
   }

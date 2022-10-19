@@ -1,6 +1,11 @@
 // run : npm run start
 
-import { generateBoard, generateEntityPos, getRandomInt } from './gameLogic.js'
+import {
+  generateBoard,
+  generateEntityPos,
+  getRandomInt,
+  checkWin,
+} from './gameLogic.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
@@ -16,6 +21,7 @@ const io = new Server(server, {
   },
 })
 
+// where we stored our data
 var rooms = new Map()
 
 const print_rooms = () => {
@@ -34,85 +40,142 @@ const n_sockets_in_room = (roomID) => {
   return n
 }
 
-const fetch_sockets_in_room = async (roomID) => {
-  const sockets_arr = []
-  const sockets = await io.in(roomID).fetchSockets()
-  sockets.forEach((socket) => {
-    sockets_arr.push(socket.id)
-  })
-  return sockets_arr
-}
-
-const update_rooms = async (roomID) => {
-  const sockets = await fetch_sockets_in_room(roomID)
-  const n = n_sockets_in_room(roomID)
-  let roomData = {
-    players: sockets,
-    n_players: n,
+const update_rooms = async (roomID, socketID) => {
+  if (rooms.has(roomID)) {
+    const roomData = rooms.get(roomID)
+    roomData['playerInfos'] = roomData['playerInfos'].filter((playerInfo) => {
+      return playerInfo.socketID !== socketID
+    })
+    rooms.set(roomID, roomData)
   }
-  rooms.set(roomID, roomData)
+  // no more player in room
+  if (n_sockets_in_room(roomID) === 0) rooms.delete(roomID)
 }
 
-const generate_gameData = (roomID) => {
+const generate_roomData = (roomID) => {
   const roomData = rooms.get(roomID)
   const board = generateBoard() // generate tiles
-  const warder_pos = generateEntityPos(board)
-  board[warder_pos[1]][warder_pos[0]] = 3 // place warder on board
-  const prison_pos = generateEntityPos(board)
-  board[prison_pos[1]][prison_pos[0]] = 4 // place warder on board
   const playerIndex = getRandomInt(1) // select player to be warder
+  const warder_pos = generateEntityPos(board)
+  const prisoner_pos = generateEntityPos(board)
+  board[warder_pos[1]][warder_pos[0]] = 3 // place warder on board
+  board[prisoner_pos[1]][prisoner_pos[0]] = 4 // place prisoner on board
 
-  const gameData = {
+  const new_roomData = {
     ...roomData,
     board: board,
-    warder: playerIndex,
+    warder: roomData.playerInfos[playerIndex].socketID,
+    prisoner: roomData.playerInfos[1 - playerIndex].socketID,
     warder_pos: warder_pos,
-    prisoner: 1 - playerIndex,
-    prison_pos: prison_pos,
+    prisoner_pos: prisoner_pos,
     turn: playerIndex,
-    // add score
   }
-  rooms.set(roomID, gameData)
 
-  return gameData
+  rooms.set(roomID, new_roomData)
+  return new_roomData
 }
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
-  console.log(`${socket.id} : ${io.engine.clientsCount}`)
+  // console.log(`${socket.id} : ${io.engine.clientsCount}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
 
-  // SERVER LISTENER
   // join room
   socket.on('join_room', async (roomID, playerName) => {
-    let n = n_sockets_in_room(roomID)
-    if (n >= 2) {
+    if (n_sockets_in_room(roomID) >= 2) {
       socket.emit('room_full')
     } else {
       // can join
       socket.join(roomID)
       socket.emit('set_roomID') // set gameData.roomID
-      await update_rooms(roomID)
 
+      const newPlayerInfo = {
+        name: playerName,
+        socketID: socket.id,
+        score: 0,
+      }
+      // no room yet
+      if (!rooms.has(roomID)) {
+        let roomData = {
+          playerInfos: [newPlayerInfo],
+        }
+        rooms.set(roomID, roomData)
+      } else {
+        // alr has room
+        let roomData = rooms.get(roomID)
+        roomData['playerInfos'].push(newPlayerInfo)
+        rooms.set(roomID, roomData)
+      }
+
+      // 2 players in room already
       if (n_sockets_in_room(roomID) === 2) {
-        const gameData = await generate_gameData(roomID)
-        io.in(roomID).emit('start_game', gameData) // start the game
+        const roomData = await generate_roomData(roomID)
+        io.to(roomID).emit('start_game', roomData) // start the game
+        io.to(roomData.warder).emit('assign_role', 'warder')
+        io.to(roomData.prisoner).emit('assign_role', 'prisoner')
       }
       print_rooms()
     }
   })
 
-  socket.on('leave_room', async (roomID) => {
+  socket.on('leave_room', (roomID) => {
     socket.leave(roomID)
-    await update_rooms(roomID)
-    if (rooms.get(roomID)['n_players'] === 0) {
-      rooms.delete(roomID)
-    }
+    update_rooms(roomID, socket.id)
     print_rooms()
   })
 
-  // socket.on('req_restart', room)
+  socket.on('clicked_tile', (roomID, role, x, y) => {
+    const roomData = rooms.get(roomID)
+
+    if (role === 'warder') {
+      if (checkWin('warder', x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', 'warder')
+        return
+      }
+
+      const old_x = roomData.warder_pos[0]
+      const old_y = roomData.warder_pos[1]
+      let newBoard = roomData.board
+      newBoard[y][x] = 3 // change warder pos
+      newBoard[old_y][old_x] = 0 // change set old pos to 0
+      rooms.set(roomID, {
+        ...roomData,
+        warder_pos: [x, y],
+        board: newBoard,
+      })
+    } else if (role === 'prisoner') {
+      if (checkWin('prisoner', x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', 'prisoner')
+        return
+      }
+
+      const old_x = roomData.prisoner_pos[0]
+      const old_y = roomData.prisoner_pos[1]
+      let newBoard = roomData.board
+      newBoard[y][x] = 4 // change prisoner pos
+      newBoard[old_y][old_x] = 0 // change set old pos to 0
+      rooms.set(roomID, {
+        ...roomData,
+        prisoner_pos: [x, y],
+        board: newBoard,
+      })
+    }
+
+    io.to(roomID).emit('update_gameData', rooms.get(roomID))
+    print_rooms()
+  })
+
+  socket.on('disconnecting', () => {
+    // console.log(socket.rooms) // the Set contains at least the socket ID
+    socket.rooms.forEach((room) => {
+      // console.log('DISCONNECT', room)
+      update_rooms(room, socket.id)
+    })
+    // print_rooms()
+  })
+
+  //end on connect
 })
 
 server.listen(PORT, () => {
