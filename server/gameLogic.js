@@ -8,6 +8,7 @@ const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
     3 : warder
     4 : prisoner
 */
+
 export const generateBoard = () => {
   let board = createArray(grid_size)
   board = generateObstacle(board)
@@ -59,6 +60,12 @@ export const createArray = (size) => {
 
 export const getRandomInt = (max) => {
   return Math.floor(Math.random() * (max + 1))
+}
+
+export const checkWin = (role, x, y, board) => {
+  if (role === 'warder' && board[y][x] === 4) return true
+  if (role === 'prisoner' && board[y][x] === 2) return true
+  return false
 }
 
 // var board = generateBoard()

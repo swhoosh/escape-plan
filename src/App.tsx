@@ -1,7 +1,8 @@
-import { useState, useEffect, createContext, useMemo } from 'react'
+import { useState, createContext, useMemo } from 'react'
 import io from 'socket.io-client'
-import './App.css'
-import Game from './components/Game'
+
+import Board from './components/Board'
+import GameHeader from './components/GameHeader'
 import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 
@@ -15,28 +16,65 @@ const App = () => {
   const [gameData, setGameData] = useState({
     // connect to server
     socket: io('http://localhost:6050'),
-    playerName: '',
+    name: '',
     roomID: '',
     playing: false,
-    board: null,
-    myTurn: false,
     role: '',
+    myTurn: false,
+    roomData: {},
   })
 
-  gameData.socket.on('start_game', (roomData) => {})
-
   const value = useMemo(() => ({ gameData, setGameData }), [gameData])
+
+  const onLog = () => {
+    console.log(gameData)
+  }
+
+  gameData.socket.on('start_game', (roomData) => {
+    setGameData({
+      ...gameData,
+      playing: true,
+      roomData: roomData,
+    })
+    // console.log(gameData)
+  })
+
+  gameData.socket.on('assign_role', (role) => {
+    setGameData({
+      ...gameData,
+      role: role,
+    })
+  })
+
+  gameData.socket.on('update_gameData', (roomData) => {
+    setGameData({
+      ...gameData,
+      roomData: roomData,
+    })
+  })
+
+  gameData.socket.on('player_won', (role) => {
+    console.log(`${role} WON !`)
+    gameData.playing = false
+  })
 
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={value}>
-      <div className='App'>
-        <h1>Welcome {gameData.playerName}, to Escape Plan</h1>
-        <h3>socket id : {gameData.socket.id}</h3>
-        <InputName />
-        <h3>Room : {gameData.roomID}</h3>
-        <InputRoom />
-        <Game />
+      <div className='flex min-h-screen relative bg-black text-white justify-center items-center font-comfy text-2xl'>
+        <div className='text-4xl'>Welcome {gameData.name}, to Escape Plan</div>
+        <>
+          <div>socket id : {gameData.socket.id}</div>
+          <div>Room : {gameData.roomID}</div>
+        </>
+        <>
+          <InputName />
+          <InputRoom />
+        </>
+
+        <button onClick={onLog}>log gameData</button>
+        {/* {gameData.playing && <GameHeader />} */}
+        {gameData.playing && <Board />}
       </div>
     </GameContext.Provider>
   )
