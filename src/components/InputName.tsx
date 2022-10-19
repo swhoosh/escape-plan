@@ -23,8 +23,9 @@ const InputName = () => {
   }
 
   return (
-    <div>
+    <div className='relative flex flex-row mt-2'>
       <input
+        className='appearance-none flex-shrink rounded-xl py-2 px-4 bg-grey text-white leading-tight focus:outline-none focus:border-purple-500'
         type='text'
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -32,6 +33,7 @@ const InputName = () => {
         placeholder='Enter your name'
       />
       <button
+        className='flex-shrink ml-1 py-2 px-4 leading-tight bg-darkgrey hover:bg-pink rounded-full font-bold'
         onClick={(e) => {
           name.trim().length !== 0 && setPlayerName(name)
         }}

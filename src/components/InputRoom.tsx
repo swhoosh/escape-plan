@@ -40,17 +40,32 @@ const InputRoom = () => {
   })
 
   return (
-    <>
+    <div className='relative flex flex-row mt-2'>
       <input
+        className='appearance-none flex-shrink rounded-xl py-2 px-4 bg-grey text-white  leading-tight focus:outline-none focus:border-purple-500'
         type='number'
         value={roomID}
         onChange={(e) => setRoomID(e.target.value)}
         placeholder='Room Number'
       />
-      {!gameData.roomID && <button onClick={onJoin}>join</button>}
-      {gameData.roomID && <button onClick={onLeave}>leave</button>}
+      {!gameData.roomID && (
+        <button
+          className='flex-shrink  ml-1 py-2 px-4 leading-tight bg-darkgrey hover:bg-pink rounded-full font-bold'
+          onClick={onJoin}
+        >
+          join
+        </button>
+      )}
+      {gameData.roomID && (
+        <button
+          className='flex-shrink ml-1 py-2 px-4 leading-tight bg-darkgrey hover:bg-pink rounded-full font-bold'
+          onClick={onLeave}
+        >
+          leave
+        </button>
+      )}
       <div>{roomStatus}</div>
-    </>
+    </div>
   )
 }
 

@@ -61,18 +61,20 @@ const App = () => {
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={value}>
-      <div className='flex min-h-screen relative bg-black text-white justify-center items-center font-comfy text-2xl'>
+      <div className='relative flex flex-col min-h-screen bg-black text-white justify-center items-center font-comfy'>
         <div className='text-4xl'>Welcome {gameData.name}, to Escape Plan</div>
-        <>
-          <div>socket id : {gameData.socket.id}</div>
-          <div>Room : {gameData.roomID}</div>
-        </>
-        <>
-          <InputName />
-          <InputRoom />
-        </>
+        <div className='text-2xl'>
+          socket id : {gameData.socket.id} | Room : {gameData.roomID}
+        </div>
+        <InputName />
+        <InputRoom />
 
-        <button onClick={onLog}>log gameData</button>
+        <button
+          className='flex-shrink rounded-xl m-3 py-2 px-4 leading-tight bg-amber-400 hover:bg-red font-bold'
+          onClick={onLog}
+        >
+          log gameData
+        </button>
         {/* {gameData.playing && <GameHeader />} */}
         {gameData.playing && <Board />}
       </div>
