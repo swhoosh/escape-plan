@@ -57,7 +57,10 @@ const generate_roomData = (roomID) => {
   const board = generateBoard() // generate tiles
   const playerIndex = getRandomInt(1) // select player to be warder
   const warder_pos = generateEntityPos(board)
-  const prisoner_pos = generateEntityPos(board)
+  let prisoner_pos = generateEntityPos(board)
+  while (prisoner_pos[0] === warder_pos[0] && prisoner_pos[1] === warder_pos[1])
+    // generate again when got same pos
+    prisoner_pos = generateEntityPos(board)
   board[warder_pos[1]][warder_pos[0]] = 3 // place warder on board
   board[prisoner_pos[1]][prisoner_pos[0]] = 4 // place prisoner on board
 
@@ -129,37 +132,37 @@ io.on('connection', (socket) => {
     const roomData = rooms.get(roomID)
 
     if (role === 'warder') {
-      if (checkWin('warder', x, y, roomData.board)) {
-        io.to(roomID).emit('player_won', 'warder')
+      if (checkWin(role, x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', role)
         return
+      } else {
+        const old_x = roomData.warder_pos[0]
+        const old_y = roomData.warder_pos[1]
+        let newBoard = roomData.board
+        newBoard[y][x] = 3 // change warder pos
+        newBoard[old_y][old_x] = 0 // change set old pos to 0
+        rooms.set(roomID, {
+          ...roomData,
+          warder_pos: [x, y],
+          board: newBoard,
+        })
       }
-
-      const old_x = roomData.warder_pos[0]
-      const old_y = roomData.warder_pos[1]
-      let newBoard = roomData.board
-      newBoard[y][x] = 3 // change warder pos
-      newBoard[old_y][old_x] = 0 // change set old pos to 0
-      rooms.set(roomID, {
-        ...roomData,
-        warder_pos: [x, y],
-        board: newBoard,
-      })
     } else if (role === 'prisoner') {
-      if (checkWin('prisoner', x, y, roomData.board)) {
-        io.to(roomID).emit('player_won', 'prisoner')
+      if (checkWin(role, x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', role)
         return
+      } else {
+        const old_x = roomData.prisoner_pos[0]
+        const old_y = roomData.prisoner_pos[1]
+        let newBoard = roomData.board
+        newBoard[y][x] = 4 // change prisoner pos
+        newBoard[old_y][old_x] = 0 // change set old pos to 0
+        rooms.set(roomID, {
+          ...roomData,
+          prisoner_pos: [x, y],
+          board: newBoard,
+        })
       }
-
-      const old_x = roomData.prisoner_pos[0]
-      const old_y = roomData.prisoner_pos[1]
-      let newBoard = roomData.board
-      newBoard[y][x] = 4 // change prisoner pos
-      newBoard[old_y][old_x] = 0 // change set old pos to 0
-      rooms.set(roomID, {
-        ...roomData,
-        prisoner_pos: [x, y],
-        board: newBoard,
-      })
     }
 
     io.to(roomID).emit('update_gameData', rooms.get(roomID))

@@ -25,7 +25,7 @@ const InputName = () => {
   return (
     <div className='relative flex flex-row mt-2'>
       <input
-        className='appearance-none flex-shrink rounded-xl py-2 px-4 bg-grey text-white leading-tight focus:outline-none focus:border-purple-500'
+        className='appearance-none flex-shrink rounded-xl py-2 px-4 focus:ring-2 focus:ring-slate-200 bg-grey text-white leading-tight focus:outline-none focus:border-purple-500'
         type='text'
         value={name}
         onChange={(e) => setName(e.target.value)}
