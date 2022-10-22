@@ -6,12 +6,12 @@ const Board = () => {
   const { gameData } = useContext(GameContext)
 
   return (
-    <div className='relative h-1/2 m-4 p-10 '>
+    <div className='relative m-4 p-10 justify-center items-center'>
       <div className='text-2xl'>{gameData.role}</div>
-      <div className='relative aspect-square p-10 text-2xl border-2'>
+      <div className='relative flex flex-col aspect-square text-2xl border'>
         {gameData.roomData.board.map((row: any, i: number) => {
           return (
-            <div className='flex justify-between border-1' key={i}>
+            <div className='flex border' key={i}>
               {row.map((tile: any, j: number) => {
                 return <Tile key={j} tileValue={tile} i={i} j={j} />
               })}
@@ -67,7 +67,7 @@ const Tile = ({
   if (tileValue === 1)
     return (
       <button
-        className='flex-shrink aspect-square h-16  m-1 bg-white rounded-lg '
+        className='tile'
         disabled={!validMove()}
         onClick={handleOnClick}
       ></button>
@@ -75,7 +75,7 @@ const Tile = ({
   if (tileValue === 2)
     return (
       <button
-        className='flex aspect-square h-16  m-1 bg-green text-black rounded-lg '
+        className='tile bg-drac_green'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -85,7 +85,7 @@ const Tile = ({
   if (tileValue === 3)
     return (
       <button
-        className='flex aspect-square h-16  m-1 bg-red rounded-lg '
+        className='tile bg-drac_red'
         disabled={!validMove()}
         onClick={handleOnClick}
       ></button>
@@ -93,7 +93,7 @@ const Tile = ({
   if (tileValue === 4)
     return (
       <button
-        className='flex aspect-square h-16 m-1 bg-cyan rounded-lg '
+        className='tile bg-drac_cyan'
         disabled={!validMove()}
         onClick={handleOnClick}
       ></button>
@@ -101,11 +101,12 @@ const Tile = ({
   else
     return (
       <button
-        className='relative flex aspect-square h-16 m-1 bg-lightgrey rounded-lg opacity-100 disabled:opacity-20 group'
+        // className='tile bg-drac_lightgrey opacity-20 group'
+        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        <span className='w-5 h-5 m-auto bg-grey rounded-full scale-0 group-hover:scale-100'></span>
+        <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
       </button>
     )
 }

@@ -10,3 +10,10 @@
     margin: 0;
   }
 }
+
+@layer components {
+
+  .tile {
+    @apply flex aspect-square h-16 m-1 bg-drac_white text-drac_black rounded-lg shadow-md
+  }
+}

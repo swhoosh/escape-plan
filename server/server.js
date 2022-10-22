@@ -5,7 +5,7 @@ import {
   generateEntityPos,
   getRandomInt,
   checkWin,
-} from './gameLogic.js'
+} from './gameLogic/gameLogic.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
@@ -17,7 +17,8 @@ const server = http.createServer(app)
 const PORT = 6050
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // front-end
+    // origin: 'http://localhost:3000', // front-end
+    origin: '*', // front-end
   },
 })
 
@@ -166,7 +167,7 @@ io.on('connection', (socket) => {
     }
 
     io.to(roomID).emit('update_gameData', rooms.get(roomID))
-    print_rooms()
+    // print_rooms()
   })
 
   socket.on('disconnecting', () => {

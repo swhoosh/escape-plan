@@ -1,4 +1,4 @@
-import { useState, createContext, useMemo } from 'react'
+import { useState, createContext, useMemo, useEffect } from 'react'
 import io from 'socket.io-client'
 
 import Board from './components/Board'
@@ -15,7 +15,7 @@ const App = () => {
   // global state: gameData
   const [gameData, setGameData] = useState({
     // connect to server
-    socket: io('http://localhost:6050'),
+    socket: io('localhost:6050'),
     name: '',
     roomID: '',
     playing: false,
@@ -24,59 +24,62 @@ const App = () => {
     roomData: {},
   })
 
-  const value = useMemo(() => ({ gameData, setGameData }), [gameData])
-
   const onLog = () => {
     console.log(gameData)
   }
 
-  gameData.socket.on('start_game', (roomData) => {
-    setGameData({
-      ...gameData,
-      playing: true,
-      roomData: roomData,
+  useEffect(() => {
+    gameData.socket.on('start_game', (roomData) => {
+      setGameData({
+        ...gameData,
+        playing: true,
+        roomData: roomData,
+      })
+      // console.log(gameData)
     })
-    // console.log(gameData)
-  })
 
-  gameData.socket.on('assign_role', (role) => {
-    setGameData({
-      ...gameData,
-      role: role,
+    gameData.socket.on('assign_role', (role) => {
+      setGameData({
+        ...gameData,
+        role: role,
+      })
     })
-  })
 
-  gameData.socket.on('update_gameData', (roomData) => {
-    setGameData({
-      ...gameData,
-      roomData: roomData,
+    gameData.socket.on('update_gameData', (roomData) => {
+      setGameData({
+        ...gameData,
+        roomData: roomData,
+      })
     })
-  })
 
-  gameData.socket.on('player_won', (role) => {
-    console.log(`${role} WON !`)
-    gameData.playing = false
-  })
+    gameData.socket.on('player_won', (role) => {
+      console.log(`${role} WON !`)
+      gameData.playing = false
+    })
+  }, [gameData]) // end useEffect
 
   return (
     // Provide GameContext for the whole app
-    <GameContext.Provider value={value}>
-      <div className='relative flex flex-col min-h-screen bg-black text-white justify-center items-center font-comfy'>
-        <div className='text-4xl'>Welcome {gameData.name}, to Escape Plan</div>
-        <div className='text-2xl'>
+    <GameContext.Provider value={{ gameData, setGameData }}>
+      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border'>
+        <div className='relative flex flex-col border'>
+          <div className='mb-8 text-4xl text-center'>
+            Welcome to Escape Plan
+          </div>
+          {/* <InputName /> */}
+          <InputRoom />
+          <button
+            className='w-1/2 mt-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold'
+            onClick={onLog}
+          >
+            LOG gameData
+          </button>
+          {/* {gameData.playing && <GameHeader />} */}
+          {gameData.playing && <Board />}
+        </div>
+        <div className='fixed bottom-0'>
           socket id : {gameData.socket.id} | Room : {gameData.roomID}
         </div>
-        <InputName />
-        <InputRoom />
-
-        <button
-          className='flex-shrink rounded-xl m-3 py-2 px-4 leading-tight bg-amber-400 hover:bg-red font-bold'
-          onClick={onLog}
-        >
-          log gameData
-        </button>
-        {/* {gameData.playing && <GameHeader />} */}
-        {gameData.playing && <Board />}
       </div>
     </GameContext.Provider>
   )
