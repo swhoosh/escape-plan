@@ -5,6 +5,8 @@ import Board from './components/Board'
 import GameHeader from './components/GameHeader'
 import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
+import GameTimer from './components/GameTimer'
+import GameTurn from './components/GameTurn'
 
 export const GameContext = createContext<any>({})
 
@@ -22,6 +24,8 @@ const App = () => {
     role: '',
     myTurn: false,
     roomData: {},
+    gameTime: '0',
+    chat: []
   })
 
   const onLog = () => {
@@ -42,6 +46,7 @@ const App = () => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         role: role,
+        myTurn: role === 'warder'
       }))
     })
 
@@ -60,6 +65,38 @@ const App = () => {
         playing: false,
       }))
     })
+
+    gameData.socket.on('timer' , (gameTime) => {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        gameTime: gameTime
+      }))
+    })
+
+    gameData.socket.on('your_turn',() => {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        myTurn: true
+      }))
+    })
+
+    gameData.socket.on('skip_turn', () => {
+      setGameData(prevGameData => ({
+        ...prevGameData,
+        myTurn: false
+      }))
+    })
+    
+    return () => { //stop duplicate listener
+      gameData.socket.off('start_game');
+      gameData.socket.off('assign_role');
+      gameData.socket.off('update_gameData');
+      gameData.socket.off('player_won');
+      gameData.socket.off('timer');
+      gameData.socket.off('your_turn');
+      gameData.socket.off('skip_turn');
+    };
+
   }, [gameData]) // end useEffect
 
   return (
@@ -80,7 +117,12 @@ const App = () => {
           </button>
           {/* {gameData.playing && <GameHeader />} */}
           {gameData.playing && <Board />}
+          {gameData.playing && <GameTimer />}
+          {gameData.playing && <GameTurn />}
         </div>
+
+        
+
         <div className='fixed bottom-0'>
           socket id : {gameData.socket.id} | Room : {gameData.roomID}
         </div>

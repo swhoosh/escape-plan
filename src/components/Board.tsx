@@ -13,7 +13,7 @@ const Board = () => {
           return (
             <div className='flex border' key={i}>
               {row.map((tile: any, j: number) => {
-                return <Tile key={j} tileValue={tile} i={i} j={j} />
+                return <Tile key={j} tileValue={tile} i={i} j={j} myTurn = {gameData.myTurn}/>
               })}
             </div>
           )
@@ -27,17 +27,24 @@ const Tile = ({
   tileValue,
   i,
   j,
+  myTurn,
 }: {
   tileValue: number
   i: number
   j: number
+  myTurn: boolean
 }) => {
   const { gameData } = useContext(GameContext)
 
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
-      gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
-      console.log('lets go')
+      if(gameData.myTurn == true){
+        gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
+        console.log('lets go')
+        gameData.myTurn = false
+      } else {
+        console.log('not my turn')
+      }
     }
   }
 
@@ -49,7 +56,8 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
-        tileValue === 2
+        tileValue === 2 ||
+        tileValue === 3
       )
         return false
     }
@@ -58,7 +66,8 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
-        tileValue === 3
+        tileValue === 3 ||
+        tileValue === 4
       )
         return false
     }

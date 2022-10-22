@@ -8,6 +8,7 @@ import {
   getRandomInt,
   checkWin,
 } from './gameLogic/gameLogic.js'
+import { gameTimer } from './gameLogic/timer.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
@@ -24,6 +25,8 @@ const io = new Server(server, {
 
 // where we stored our data
 const all_rooms = {}
+var timerIntervalId = []
+var chatData = []
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
@@ -72,10 +75,18 @@ const generate_roomData = (roomID) => {
     prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
     warder_pos: w_pos,
     prisoner_pos: p_pos,
-    turn: playerIndex,
+    turn: 'warder',
   }
   all_rooms[roomID]['roomData'] = roomData
   return roomData
+}
+
+const skipTurn = (roomID) => {
+  const roomData = all_rooms[roomID]
+  io.to(roomData[roomData['turn']]).emit('skip_turn')
+  all_rooms[roomID]['turn'] = roomData['turn'] === 'warder' ? 'prisoner' : 'warder'
+  io.to(roomData[roomData['turn']]).emit('your_turn')
+  timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
 }
 
 // ON CLIENT CONNECTION
@@ -110,6 +121,7 @@ io.on('connection', (socket) => {
         io.to(roomID).emit('start_game', roomData) // start the game
         io.to(roomData.warder).emit('assign_role', 'warder')
         io.to(roomData.prisoner).emit('assign_role', 'prisoner')
+        timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
       }
       print_rooms()
     }
@@ -123,6 +135,9 @@ io.on('connection', (socket) => {
 
   socket.on('clicked_tile', (roomID, x, y) => {
     const roomData = all_rooms[roomID].roomData
+    const role = roomData.warder === socket.id ? 'warder':'prisoner'
+    if(roomData.turn !== role) return //not my turn 
+    roomData.turn = "none"
 
     if (roomData.warder === socket.id) {
       if (checkWin('warder', x, y, roomData.board)) {
@@ -135,6 +150,7 @@ io.on('connection', (socket) => {
         else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
 
         all_rooms[roomID]['roomData']['warder_pos'] = { x: x, y: y }
+        all_rooms[roomID]['roomData']['turn'] = 'prisoner'
       }
     } else if (roomData.prisoner === socket.id) {
       if (checkWin('prisoner', x, y, roomData.board)) {
@@ -147,10 +163,13 @@ io.on('connection', (socket) => {
         else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
 
         all_rooms[roomID]['roomData']['prisoner_pos'] = { x: x, y: y }
+        all_rooms[roomID]['roomData']['turn'] = 'warder'
       }
     }
 
+    timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
+    socket.to(roomID).emit('your_turn') // tell other socket it's ur turn
     print_rooms()
   })
 
