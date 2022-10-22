@@ -92,7 +92,7 @@ const Tile = ({
   if (tileValue === 2)
     return (
       <button
-        className='tile bg-drac_green group'
+        className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >

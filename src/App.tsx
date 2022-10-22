@@ -25,7 +25,7 @@ const App = () => {
     myTurn: false,
     roomData: {},
     gameTime: '0',
-    chat: []
+    chat: [],
   })
 
   const onLog = () => {
@@ -46,7 +46,7 @@ const App = () => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         role: role,
-        myTurn: role === 'warder'
+        myTurn: role === 'warder',
       }))
     })
 
@@ -66,39 +66,39 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('timer' , (gameTime) => {
-      setGameData(prevGameData => ({
+    gameData.socket.on('timer', (gameTime) => {
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        gameTime: gameTime
+        gameTime: gameTime,
       }))
     })
 
-    gameData.socket.on('your_turn',() => {
-      setGameData(prevGameData => ({
+    gameData.socket.on('your_turn', () => {
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        myTurn: true
+        myTurn: true,
       }))
       console.log('my turn')
     })
 
     gameData.socket.on('skip_turn', () => {
-      setGameData(prevGameData => ({
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        myTurn: false
+        myTurn: false,
       }))
       console.log('skip turn')
     })
-    
-    return () => { //stop duplicate listener
-      gameData.socket.off('start_game');
-      gameData.socket.off('assign_role');
-      gameData.socket.off('update_gameData');
-      gameData.socket.off('player_won');
-      gameData.socket.off('timer');
-      gameData.socket.off('your_turn');
-      gameData.socket.off('skip_turn');
-    };
 
+    return () => {
+      //stop duplicate listener
+      gameData.socket.off('start_game')
+      gameData.socket.off('assign_role')
+      gameData.socket.off('update_gameData')
+      gameData.socket.off('player_won')
+      gameData.socket.off('timer')
+      gameData.socket.off('your_turn')
+      gameData.socket.off('skip_turn')
+    }
   }, [gameData]) // end useEffect
 
   return (
@@ -111,22 +111,22 @@ const App = () => {
           </div>
           {/* <InputName /> */}
           <InputRoom />
-          <button
-            className='w-1/2 mt-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold'
-            onClick={onLog}
-          >
-            LOG gameData
-          </button>
           {/* {gameData.playing && <GameHeader />} */}
           {gameData.playing && <Board />}
           {gameData.playing && <GameTimer />}
           {gameData.playing && <GameTurn />}
         </div>
 
-        
-
-        <div className='fixed bottom-0'>
-          socket id : {gameData.socket.id} | Room : {gameData.roomID}
+        <div className='fixed flex flex-col w-[100%] bottom-0 border'>
+          <button
+            className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
+            onClick={onLog}
+          >
+            LOG gameData
+          </button>
+          <div className='text-center'>
+            socket id : {gameData.socket.id} | Room : {gameData.roomID}
+          </div>
         </div>
       </div>
     </GameContext.Provider>

@@ -58,7 +58,7 @@ const update_player_infos = async (roomID, socketID) => {
     }
   )
   // no more player in room
-  if (n_sockets_in_room(roomID) === 0) rooms.delete(roomID)
+  if (n_sockets_in_room(roomID) === 0) delete all_rooms[roomID]
 }
 
 const generate_roomData = (roomID) => {
@@ -85,9 +85,16 @@ const skipTurn = (roomID) => {
   const roomData = all_rooms[roomID]['roomData']
   console.log(roomData)
   io.to(roomData[roomData['turn']]).emit('skip_turn')
-  all_rooms[roomID]['roomData']['turn'] = roomData['turn'] === 'warder' ? 'prisoner' : 'warder'
+  all_rooms[roomID]['roomData']['turn'] =
+    roomData['turn'] === 'warder' ? 'prisoner' : 'warder'
   io.to(roomData[roomData['turn']]).emit('your_turn')
-  timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
+  timerIntervalId[roomID] = gameTimer(
+    io,
+    roomID,
+    timerIntervalId[roomID],
+    10,
+    skipTurn
+  )
 }
 
 // ON CLIENT CONNECTION
@@ -122,7 +129,13 @@ io.on('connection', (socket) => {
         io.to(roomID).emit('start_game', roomData) // start the game
         io.to(roomData.warder).emit('assign_role', 'warder')
         io.to(roomData.prisoner).emit('assign_role', 'prisoner')
-        timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          10,
+          skipTurn
+        )
       }
       print_rooms()
     }
@@ -136,11 +149,11 @@ io.on('connection', (socket) => {
   })
 
   socket.on('clicked_tile', (roomID, x, y) => {
-    const roomData = all_rooms[roomID]["roomData"]
-    const role = roomData.warder === socket.id ? 'warder':'prisoner'
-    const enemy_role = roomData.warder !== socket.id ? 'warder':'prisoner'
-    if(roomData.turn !== role) return //not my turn 
-    roomData.turn = "none"
+    const roomData = all_rooms[roomID]['roomData']
+    const role = roomData.warder === socket.id ? 'warder' : 'prisoner'
+    const enemy_role = roomData.warder !== socket.id ? 'warder' : 'prisoner'
+    if (roomData.turn !== role) return //not my turn
+    roomData.turn = 'none'
 
     if (roomData.warder === socket.id) {
       if (checkWin('warder', x, y, roomData.board)) {
@@ -170,7 +183,13 @@ io.on('connection', (socket) => {
       }
     }
 
-    timerIntervalId[roomID] = gameTimer(io,roomID,timerIntervalId[roomID],10,skipTurn)
+    timerIntervalId[roomID] = gameTimer(
+      io,
+      roomID,
+      timerIntervalId[roomID],
+      10,
+      skipTurn
+    )
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
     socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
     print_rooms()

@@ -64,7 +64,7 @@ const InputRoom = () => {
       />
       {!gameData.roomID && (
         <button
-          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_darkgreen hover:bg-drac_green rounded-full font-bold'
+          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40 rounded-full font-bold'
           onClick={onJoin}
         >
           join
@@ -72,13 +72,13 @@ const InputRoom = () => {
       )}
       {gameData.roomID && !gameData.playing && (
         <button
-          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_red hover:bg-drac_lightred rounded-full font-bold'
+          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_red hover:bg-drac_lightred shadow-lg shadow-drac_red/40 rounded-full font-bold'
           onClick={onLeave}
         >
           leave
         </button>
       )}
-      <div className='mt-3 m-auto'>{roomStatus}</div>
+      <div className='mt-3 m-auto text-md'>{roomStatus}</div>
     </div>
   )
 }

@@ -15,7 +15,7 @@
 
   .tile {
     @apply relative flex aspect-square w-[15%] bg-drac_white text-drac_black rounded-lg shadow-md 
-      enabled:hover:scale-150 transition-all duration-100
+      enabled:hover:scale-125 transition-all duration-100
   }
 
   .dot {
