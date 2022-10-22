@@ -185,3 +185,8 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`[SERVER] listening on port ${PORT}`)
 })
+
+const generatePath = () =>{
+  console.log("test")
+
+}
