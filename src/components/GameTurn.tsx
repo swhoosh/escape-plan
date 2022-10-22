@@ -18,9 +18,9 @@ const GameTurn = () => {
   const turn_element = <p style={tStyle}>{text}</p>
   
   return (
-    <>
+    <div className='flex border justify-center items-center'>
       { turn_element }
-    </>
+    </div>
   )
 }
 

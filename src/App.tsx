@@ -78,6 +78,7 @@ const App = () => {
         ...prevGameData,
         myTurn: true
       }))
+      console.log('my turn')
     })
 
     gameData.socket.on('skip_turn', () => {
@@ -85,6 +86,7 @@ const App = () => {
         ...prevGameData,
         myTurn: false
       }))
+      console.log('skip turn')
     })
     
     return () => { //stop duplicate listener

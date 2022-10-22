@@ -108,17 +108,30 @@ const Tile = ({
         onClick={handleOnClick}
       ></button>
     )
-  else
-    return (
-      <button
-        // className='tile bg-drac_lightgrey opacity-20 group'
-        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
-        disabled={!validMove()}
-        onClick={handleOnClick}
-      >
-        <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
-      </button>
-    )
+  else //normal block
+    if(myTurn) {
+      return (
+        <button
+          // className='tile bg-drac_lightgrey opacity-20 group'
+          className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
+          disabled={!validMove()}
+          onClick={handleOnClick}
+        >
+          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
+        </button>
+      )
+    } else {
+      return (
+        <button
+          // className='tile bg-drac_lightgrey opacity-20 group'
+          className='tile bg-drac_lightgrey opacity-40 disabled:opacity-20 group'
+          disabled={!validMove()}
+          onClick={handleOnClick}
+        >
+          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
+        </button>
+      )
+    }
 }
 
 export default Board

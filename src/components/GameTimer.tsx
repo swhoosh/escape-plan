@@ -8,10 +8,10 @@ const GameTimer = () => {
   //   console.log("Mounted")
   // }, [])
   return (
-    <>
-      <p>time</p>
+    <div className='flex border justify-center items-center'>
+      <p>time :&nbsp;</p>
       {gameData.gameTime}
-    </>
+    </div>
   )
 }
 
