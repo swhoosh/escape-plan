@@ -7,6 +7,7 @@ import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
+import ChatBox from './components/ChatBox'
 
 export const GameContext = createContext<any>({})
 
@@ -121,6 +122,7 @@ const App = () => {
           {gameData.playing && <Board />}
           {gameData.playing && <GameTimer />}
           {gameData.playing && <GameTurn />}
+          {<ChatBox />}
         </div>
 
         
