@@ -13,7 +13,7 @@ const Board = () => {
           return (
             <div className='flex border' key={i}>
               {row.map((tile: any, j: number) => {
-                return <Tile key={j} tileValue={tile} i={i} j={j} />
+                return <Tile key={j} tileValue={tile} i={i} j={j} myTurn = {gameData.myTurn}/>
               })}
             </div>
           )
@@ -27,17 +27,24 @@ const Tile = ({
   tileValue,
   i,
   j,
+  myTurn,
 }: {
   tileValue: number
   i: number
   j: number
+  myTurn: boolean
 }) => {
   const { gameData } = useContext(GameContext)
 
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
-      gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
-      console.log('lets go')
+      if(gameData.myTurn == true){
+        gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
+        console.log('lets go')
+        gameData.myTurn = false
+      } else {
+        console.log('not my turn')
+      }
     }
   }
 
@@ -49,7 +56,8 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
-        tileValue === 2
+        tileValue === 2 ||
+        tileValue === 3
       )
         return false
     }
@@ -58,7 +66,8 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
-        tileValue === 3
+        tileValue === 3 ||
+        tileValue === 4
       )
         return false
     }
@@ -99,17 +108,30 @@ const Tile = ({
         onClick={handleOnClick}
       ></button>
     )
-  else
-    return (
-      <button
-        // className='tile bg-drac_lightgrey opacity-20 group'
-        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
-        disabled={!validMove()}
-        onClick={handleOnClick}
-      >
-        <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
-      </button>
-    )
+  else //normal block
+    if(myTurn) {
+      return (
+        <button
+          // className='tile bg-drac_lightgrey opacity-20 group'
+          className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
+          disabled={!validMove()}
+          onClick={handleOnClick}
+        >
+          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
+        </button>
+      )
+    } else {
+      return (
+        <button
+          // className='tile bg-drac_lightgrey opacity-20 group'
+          className='tile bg-drac_lightgrey opacity-40 disabled:opacity-20 group'
+          disabled={!validMove()}
+          onClick={handleOnClick}
+        >
+          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
+        </button>
+      )
+    }
 }
 
 export default Board
