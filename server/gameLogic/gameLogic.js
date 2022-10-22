@@ -8,7 +8,6 @@ const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
     3 : warder
     4 : prisoner
 */
-
 export const generateBoard = () => {
   let board = createArray(grid_size)
   board = generateObstacle(board)
@@ -45,7 +44,7 @@ export const generateEntityPos = (board) => {
     let x = getRandomInt(grid_size - 1)
     let y = getRandomInt(grid_size - 1)
     if (board[y][x] === 0) {
-      return [x, y]
+      return { x: x, y: y }
     }
   }
 }

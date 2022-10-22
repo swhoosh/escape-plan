@@ -36,7 +36,7 @@ const Tile = ({
 
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
-      gameData.socket.emit('clicked_tile', gameData.roomID, gameData.role, j, i)
+      gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
       console.log('lets go')
     }
   }
@@ -47,8 +47,8 @@ const Tile = ({
     // player is warder
     if (gameData.role === 'warder') {
       if (
-        Math.abs(gameData.roomData.warder_pos[0] - j) > 1 ||
-        Math.abs(gameData.roomData.warder_pos[1] - i) > 1 ||
+        Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
+        Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
         tileValue === 2
       )
         return false
@@ -56,8 +56,9 @@ const Tile = ({
     // player is prisoner
     if (gameData.role === 'prisoner') {
       if (
-        Math.abs(gameData.roomData.prisoner_pos[0] - j) > 1 ||
-        Math.abs(gameData.roomData.prisoner_pos[1] - i) > 1
+        Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
+        Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
+        tileValue === 3
       )
         return false
     }

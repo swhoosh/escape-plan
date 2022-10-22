@@ -1,5 +1,7 @@
 // run : npm run start
 
+import util from 'util'
+
 import {
   generateBoard,
   generateEntityPos,
@@ -9,8 +11,6 @@ import {
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
-// const http = require('http')
-// const { Server } = require('socket.io')
 
 const app = express()
 const server = http.createServer(app)
@@ -23,60 +23,59 @@ const io = new Server(server, {
 })
 
 // where we stored our data
-var rooms = new Map()
+const all_rooms = {}
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
-  rooms.forEach((value, key) => {
-    console.log(key, ' -> ', value)
-  })
+  for (var roomID in all_rooms) {
+    if (all_rooms.hasOwnProperty(roomID)) {
+      // console.log(roomID, '=>', JSON.stringify(all_rooms[roomID]))
+      console.log(
+        roomID,
+        '=>',
+        util.inspect(all_rooms[roomID], false, null, true)
+      )
+    }
+  }
 }
 
+// get number of sockets in room
 const n_sockets_in_room = (roomID) => {
   let n = 0
   if (io.sockets.adapter.rooms.has(roomID)) {
-    // get number sockets in room
     n = io.sockets.adapter.rooms.get(roomID).size
   }
   return n
 }
 
-const update_rooms = async (roomID, socketID) => {
-  if (rooms.has(roomID)) {
-    const roomData = rooms.get(roomID)
-    roomData['playerInfos'] = roomData['playerInfos'].filter((playerInfo) => {
-      return playerInfo.socketID !== socketID
-    })
-    rooms.set(roomID, roomData)
-  }
+const update_player_infos = async (roomID, socketID) => {
+  all_rooms[roomID].playerInfos = all_rooms[roomID]['playerInfos'].filter(
+    (obj) => {
+      return obj.socketID !== socketID
+    }
+  )
   // no more player in room
   if (n_sockets_in_room(roomID) === 0) rooms.delete(roomID)
 }
 
 const generate_roomData = (roomID) => {
-  const roomData = rooms.get(roomID)
-  const board = generateBoard() // generate tiles
+  const board = generateBoard() // generate empty board with obstacles
   const playerIndex = getRandomInt(1) // select player to be warder
-  const warder_pos = generateEntityPos(board)
-  let prisoner_pos = generateEntityPos(board)
-  while (prisoner_pos[0] === warder_pos[0] && prisoner_pos[1] === warder_pos[1])
-    // generate again when got same pos
-    prisoner_pos = generateEntityPos(board)
-  board[warder_pos[1]][warder_pos[0]] = 3 // place warder on board
-  board[prisoner_pos[1]][prisoner_pos[0]] = 4 // place prisoner on board
+  const w_pos = generateEntityPos(board) // get random pos {x, y}
+  board[w_pos.y][w_pos.x] = 3 // place warder on the board
+  const p_pos = generateEntityPos(board) // get random pos {x, y}
+  board[p_pos.y][p_pos.x] = 4 // place prisoner on the board
 
-  const new_roomData = {
-    ...roomData,
+  const roomData = {
     board: board,
-    warder: roomData.playerInfos[playerIndex].socketID,
-    prisoner: roomData.playerInfos[1 - playerIndex].socketID,
-    warder_pos: warder_pos,
-    prisoner_pos: prisoner_pos,
+    warder: all_rooms[roomID]['playerInfos'][playerIndex].socketID,
+    prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
+    warder_pos: w_pos,
+    prisoner_pos: p_pos,
     turn: playerIndex,
   }
-
-  rooms.set(roomID, new_roomData)
-  return new_roomData
+  all_rooms[roomID]['roomData'] = roomData
+  return roomData
 }
 
 // ON CLIENT CONNECTION
@@ -100,21 +99,14 @@ io.on('connection', (socket) => {
         score: 0,
       }
       // no room yet
-      if (!rooms.has(roomID)) {
-        let roomData = {
-          playerInfos: [newPlayerInfo],
-        }
-        rooms.set(roomID, roomData)
+      if (!(roomID in all_rooms)) {
+        all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
       } else {
-        // alr has room
-        let roomData = rooms.get(roomID)
-        roomData['playerInfos'].push(newPlayerInfo)
-        rooms.set(roomID, roomData)
+        all_rooms[roomID]['playerInfos'].push(newPlayerInfo)
       }
-
       // 2 players in room already
       if (n_sockets_in_room(roomID) === 2) {
-        const roomData = await generate_roomData(roomID)
+        const roomData = generate_roomData(roomID)
         io.to(roomID).emit('start_game', roomData) // start the game
         io.to(roomData.warder).emit('assign_role', 'warder')
         io.to(roomData.prisoner).emit('assign_role', 'prisoner')
@@ -125,57 +117,49 @@ io.on('connection', (socket) => {
 
   socket.on('leave_room', (roomID) => {
     socket.leave(roomID)
-    update_rooms(roomID, socket.id)
+    update_player_infos(roomID, socket.id)
     print_rooms()
   })
 
-  socket.on('clicked_tile', (roomID, role, x, y) => {
-    const roomData = rooms.get(roomID)
+  socket.on('clicked_tile', (roomID, x, y) => {
+    const roomData = all_rooms[roomID].roomData
 
-    if (role === 'warder') {
-      if (checkWin(role, x, y, roomData.board)) {
-        io.to(roomID).emit('player_won', role)
-        return
+    if (roomData.warder === socket.id) {
+      if (checkWin('warder', x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', 'warder')
       } else {
-        const old_x = roomData.warder_pos[0]
-        const old_y = roomData.warder_pos[1]
-        let newBoard = roomData.board
-        newBoard[y][x] = 3 // change warder pos
-        newBoard[old_y][old_x] = 0 // change set old pos to 0
-        rooms.set(roomID, {
-          ...roomData,
-          warder_pos: [x, y],
-          board: newBoard,
-        })
+        const old_pos = roomData.warder_pos
+        all_rooms[roomID].roomData.board[y][x] = 3 // move warder in board
+
+        if (old_pos.y === y && old_pos.x === x);
+        else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
+
+        all_rooms[roomID]['roomData']['warder_pos'] = { x: x, y: y }
       }
-    } else if (role === 'prisoner') {
-      if (checkWin(role, x, y, roomData.board)) {
-        io.to(roomID).emit('player_won', role)
-        return
+    } else if (roomData.prisoner === socket.id) {
+      if (checkWin('prisoner', x, y, roomData.board)) {
+        io.to(roomID).emit('player_won', 'prisoner')
       } else {
-        const old_x = roomData.prisoner_pos[0]
-        const old_y = roomData.prisoner_pos[1]
-        let newBoard = roomData.board
-        newBoard[y][x] = 4 // change prisoner pos
-        newBoard[old_y][old_x] = 0 // change set old pos to 0
-        rooms.set(roomID, {
-          ...roomData,
-          prisoner_pos: [x, y],
-          board: newBoard,
-        })
+        const old_pos = roomData.prisoner_pos
+        all_rooms[roomID].roomData.board[y][x] = 4 // move prisoner in board
+
+        if (old_pos.y === y && old_pos.x === x);
+        else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
+
+        all_rooms[roomID]['roomData']['prisoner_pos'] = { x: x, y: y }
       }
     }
 
-    io.to(roomID).emit('update_roomData', rooms.get(roomID))
-    // print_rooms()
+    io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
+    print_rooms()
   })
 
   socket.on('disconnecting', () => {
     // console.log(socket.rooms) // the Set contains at least the socket ID
-    socket.rooms.forEach((room) => {
-      // console.log('DISCONNECT', room)
-      update_rooms(room, socket.id)
-    })
+    // socket.rooms.forEach((room) => {
+    // console.log('DISCONNECT', room)
+    // update_player_infos(room, socket.id)
+    // })
     // print_rooms()
   })
 
@@ -186,7 +170,6 @@ server.listen(PORT, () => {
   console.log(`[SERVER] listening on port ${PORT}`)
 })
 
-const generatePath = () =>{
-  console.log("test")
-
+const generatePath = () => {
+  console.log('test')
 }

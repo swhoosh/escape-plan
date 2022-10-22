@@ -46,6 +46,7 @@ const App = () => {
     })
 
     gameData.socket.on('update_roomData', (roomData) => {
+      // console.log(roomData)
       setGameData((prevGameData) => ({
         ...prevGameData,
         roomData: roomData,
