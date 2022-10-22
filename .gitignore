@@ -8,6 +8,7 @@
 # testing
 /coverage
 /server/gameLogic/test.js
+/server/gameLogic/index.html
 
 # production
 /build
