@@ -166,7 +166,7 @@ io.on('connection', (socket) => {
       }
     }
 
-    io.to(roomID).emit('update_gameData', rooms.get(roomID))
+    io.to(roomID).emit('update_roomData', rooms.get(roomID))
     // print_rooms()
   })
 

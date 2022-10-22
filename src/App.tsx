@@ -30,31 +30,34 @@ const App = () => {
 
   useEffect(() => {
     gameData.socket.on('start_game', (roomData) => {
-      setGameData({
-        ...gameData,
+      setGameData((prevGameData) => ({
+        ...prevGameData,
         playing: true,
         roomData: roomData,
-      })
+      }))
       // console.log(gameData)
     })
 
     gameData.socket.on('assign_role', (role) => {
-      setGameData({
-        ...gameData,
+      setGameData((prevGameData) => ({
+        ...prevGameData,
         role: role,
-      })
+      }))
     })
 
-    gameData.socket.on('update_gameData', (roomData) => {
-      setGameData({
-        ...gameData,
+    gameData.socket.on('update_roomData', (roomData) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
         roomData: roomData,
-      })
+      }))
     })
 
     gameData.socket.on('player_won', (role) => {
       console.log(`${role} WON !`)
-      gameData.playing = false
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        playing: false,
+      }))
     })
   }, [gameData]) // end useEffect
 
