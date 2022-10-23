@@ -159,6 +159,8 @@ io.on('connection', (socket) => {
   // ON LEAVE ROOM
   socket.on('leave_room', (roomID) => {
     io.to(roomID).emit('update_playerInfo', {}, false)
+    io.to(roomID).emit('update_playing', false)
+    io.to(roomID).emit('update_showBoard', false)
     socket.leave(roomID)
     clearInterval(timerIntervalId[roomID])
     update_player_infos(roomID, socket.id)

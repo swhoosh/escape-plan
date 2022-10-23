@@ -7,8 +7,6 @@ const Board = () => {
 
   return (
     <div className='relative justify-center items-center border'>
-      <div className='text-2xl'>{gameData.role}</div>
-
       <div className='relative flex flex-col justify-evenly aspect-square text-2xl border'>
         {gameData.roomData.board.map((row: any, i: number) => {
           return (

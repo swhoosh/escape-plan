@@ -2,7 +2,6 @@ import { useState, createContext, useMemo, useEffect } from 'react'
 import io from 'socket.io-client'
 
 import Board from './components/Board'
-import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
@@ -129,29 +128,30 @@ const App = () => {
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
-      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center font-comfy'>
+      <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center font-comfy'>
         {gameData.showResult && (
           <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
         )}
-        <div className='relative flex-grow flex-col min-w-[320px] max-w-[60%] border'>
+        <div className='relative flex-grow flex-col min-w-[320px] max-w-[1024px] border'>
           <div className='mb-8 text-4xl text-center'>Escape Plan</div>
           <InputRoom />
-          <div className='grid grid-cols-5 gap-3'>
+          <div className='grid grid-cols-4 gap-3'>
             {gameData.showPlayerInfos && (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}
                 role={gameData.role}
+                playing={gameData.playing}
               />
             )}
-            <div className='col-span-3'>
+            <div className='col-span-2'>
               {gameData.showBoard && <Board />}
-              {gameData.playing && <GameTimer />}
+              {/* {gameData.playing && <GameTimer />} */}
               {gameData.playing && <GameTurn />}
             </div>
           </div>
         </div>
 
-        <div className='fixed flex flex-col w-[100%] bottom-0'>
+        <div className='fixed flex flex-col bottom-0'>
           <button
             className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
             onClick={onLog}

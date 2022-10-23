@@ -8,9 +8,8 @@ const GameTimer = () => {
   //   console.log("Mounted")
   // }, [])
   return (
-    <div className='flex border justify-center items-center'>
-      <p>time :&nbsp;</p>
-      {gameData.gameTime}
+    <div className='absolute top-1/2 translate-y-[-50%] left-1/2 translate-x-[-50%] text-2xl'>
+      <p className=''>time : {gameData.gameTime}</p>
     </div>
   )
 }
