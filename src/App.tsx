@@ -27,6 +27,9 @@ const App = () => {
     roomData: {},
     gameTime: '0',
     chat: [],
+    showPlayerInfos: false,
+    playerInfos: {},
+    showResult: false,
   })
 
   const onLog = () => {
@@ -34,13 +37,19 @@ const App = () => {
   }
 
   useEffect(() => {
+    gameData.socket.on('update_playerInfo', (playerInfos) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        showPlayerInfos: true,
+        playerInfos: playerInfos,
+      }))
+    })
     gameData.socket.on('start_game', (roomData) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         playing: true,
         roomData: roomData,
       }))
-      // console.log(gameData)
     })
 
     gameData.socket.on('assign_role', (role) => {
@@ -63,7 +72,8 @@ const App = () => {
       console.log(`${role} WON !`)
       setGameData((prevGameData) => ({
         ...prevGameData,
-        playing: false,
+        // playing: false,
+        showResult: true,
       }))
     })
 
@@ -106,7 +116,7 @@ const App = () => {
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border border-red-600'>
-        <GameResult />
+        {gameData.showResult && <GameResult />}
         <div className='relative flex flex-col border'>
           <div className='mb-8 text-4xl text-center'>
             Welcome to Escape Plan

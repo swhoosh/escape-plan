@@ -116,6 +116,7 @@ io.on('connection', (socket) => {
         name: playerName,
         socketID: socket.id,
         score: 0,
+        priority: 0,
       }
       // no room yet
       if (!(roomID in all_rooms)) {
@@ -137,6 +138,7 @@ io.on('connection', (socket) => {
           skipTurn
         )
       }
+      io.to(roomID).emit('update_playerInfo', all_rooms[roomID]['playerInfos'])
       print_rooms()
     }
   })
