@@ -2,4 +2,4 @@ import { io } from "socket.io-client";
 
 
 
-export const socket = io('localhost:6050/chat');
+export const socketChat = io('localhost:6050/chat');
