@@ -25,6 +25,7 @@ const InputRoom = () => {
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
       gameData.socket.emit('join_room', roomID, name, gameData.socket.id)
     } else setRoomStatus('ERROR : Enter Room Number')
+    setPlayerName(name)
   }
   // Leave Existing Room
   const onLeave = () => {

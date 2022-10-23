@@ -132,14 +132,14 @@ const App = () => {
           {gameData.playing && <Board />}
           {gameData.playing && <GameTimer />}
           {gameData.playing && <GameTurn />}
-          <ChatBox 
+          {/* <ChatBox 
+            chatScope='rooom1'
+          /> */}
+        </div>
+        <ChatBox 
             chatScope='global'
             chatPeriod='all'
-          />
-          <ChatBox 
-            chatScope='rooom1'
-          />
-        </div>
+        />
 
         
 

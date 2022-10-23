@@ -104,15 +104,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({chatScope,chatPeriod}) => {
   }
 
   return (
-    <>
-    <button className='bg-blue' onClick={logChat}>
+    <div 
+      className='flex flex-col ml-5 border'
+      style={{width:'50%',height:'30%',overflowY:'scroll',overflowX:'hidden'}}
+    >
+      {/* <button className='w-1/2 mb-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold' onClick={logChat}>
       log chat
-    </button>
-      {chat()}
-      <ChatInput 
-        chatScope={chatScope}
-        />
-    </>
+      </button> */}
+      <div className='relative flex flex-col'>
+        {chat()}
+        <ChatInput 
+          chatScope={chatScope}
+          />
+      </div>
+    </div>
   )
 }
 
@@ -139,15 +144,15 @@ const ChatInput: React.FC<ChatInputProps> = ({chatScope}) => {
   }
 
   return (
-    <div className = 'flex'>
-      <input className='appearance-none flex-initial m-auto w-1/2 py-2 pl-4 rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
+    <div className = 'flex flex-row'>
+      <input className='appearance-none mb-5 mt-5 flex-initial m-auto w-1/2 py-2 pl-4 rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
         type='text'
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder='chat'>
       </input>
       <button
-          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_darkgreen hover:bg-drac_green rounded-full font-bold'
+          className='flex-initial w-1/5 mb-5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_darkgreen hover:bg-drac_green rounded-full font-bold'
           onClick={sendMessage}
         >
           send
