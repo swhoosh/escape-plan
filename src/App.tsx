@@ -2,12 +2,13 @@ import { useState, createContext, useMemo, useEffect } from 'react'
 import io from 'socket.io-client'
 
 import Board from './components/Board'
-import GameHeader from './components/GameHeader'
 import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
 import GameResult from './components/GameResult'
+import { Socket } from 'dgram'
+import PlayerInfos from './components/PlayerInfos'
 
 export const GameContext = createContext<any>({})
 
@@ -21,6 +22,7 @@ const App = () => {
     socket: io('localhost:6050'),
     name: '',
     roomID: '',
+    showBoard: false,
     playing: false,
     role: '',
     myTurn: false,
@@ -37,18 +39,38 @@ const App = () => {
   }
 
   useEffect(() => {
-    gameData.socket.on('update_playerInfo', (playerInfos) => {
+    gameData.socket.on('update_playerInfo', (playerInfos, showPlayerInfos) => {
+      if (JSON.stringify(playerInfos) !== '{}') {
+        playerInfos[0].socketID === gameData.socket.id
+          ? (playerInfos[0].priority = 1)
+          : (playerInfos[1].priority = 1)
+      }
+
       setGameData((prevGameData) => ({
         ...prevGameData,
-        showPlayerInfos: true,
         playerInfos: playerInfos,
+        showPlayerInfos: showPlayerInfos,
       }))
     })
-    gameData.socket.on('start_game', (roomData) => {
+
+    gameData.socket.on('update_roomData', (roomData) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
-        playing: true,
         roomData: roomData,
+      }))
+    })
+
+    gameData.socket.on('update_showBoard', (showBoard) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        showBoard: showBoard,
+      }))
+    })
+
+    gameData.socket.on('update_playing', (playing) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        playing: playing,
       }))
     })
 
@@ -60,19 +82,11 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('update_roomData', (roomData) => {
-      // console.log(roomData)
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        roomData: roomData,
-      }))
-    })
-
     gameData.socket.on('player_won', (role) => {
       console.log(`${role} WON !`)
       setGameData((prevGameData) => ({
         ...prevGameData,
-        // playing: false,
+        playing: false,
         showResult: true,
       }))
     })
@@ -115,21 +129,29 @@ const App = () => {
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
-      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border border-red-600'>
-        {gameData.showResult && <GameResult />}
-        <div className='relative flex flex-col border'>
-          <div className='mb-8 text-4xl text-center'>
-            Welcome to Escape Plan
-          </div>
-          {/* <InputName /> */}
+      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center font-comfy'>
+        {gameData.showResult && (
+          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+        )}
+        <div className='relative flex-grow flex-col min-w-[320px] max-w-[60%] border'>
+          <div className='mb-8 text-4xl text-center'>Escape Plan</div>
           <InputRoom />
-          {/* {gameData.playing && <GameHeader />} */}
-          {gameData.playing && <Board />}
-          {gameData.playing && <GameTimer />}
-          {gameData.playing && <GameTurn />}
+          <div className='grid grid-cols-5 gap-3'>
+            {gameData.showPlayerInfos && (
+              <PlayerInfos
+                playerInfos={gameData.playerInfos}
+                role={gameData.role}
+              />
+            )}
+            <div className='col-span-3'>
+              {gameData.showBoard && <Board />}
+              {gameData.playing && <GameTimer />}
+              {gameData.playing && <GameTurn />}
+            </div>
+          </div>
         </div>
 
-        <div className='fixed flex flex-col w-[100%] bottom-0 border'>
+        <div className='fixed flex flex-col w-[100%] bottom-0'>
           <button
             className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
             onClick={onLog}

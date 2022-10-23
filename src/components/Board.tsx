@@ -6,7 +6,7 @@ const Board = () => {
   const { gameData } = useContext(GameContext)
 
   return (
-    <div className='relative m-4 p-10 justify-center items-center border'>
+    <div className='relative justify-center items-center border'>
       <div className='text-2xl'>{gameData.role}</div>
 
       <div className='relative flex flex-col justify-evenly aspect-square text-2xl border'>
