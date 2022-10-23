@@ -18,7 +18,7 @@ const App = () => {
   // global state: gameData
   const [gameData, setGameData] = useState({
     // connect to server
-    socket: io('localhost:6050'),
+    socket: io('localhost:6050/'),
     name: '',
     roomID: '',
     playing: false,
@@ -26,12 +26,22 @@ const App = () => {
     myTurn: false,
     roomData: {},
     gameTime: '0',
-    chat: []
+    chat: [],
+    socketID: ''
   })
 
   const onLog = () => {
     console.log(gameData)
   }
+
+  useEffect(() => {
+    gameData.socket.on('connect', () => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        socketID: gameData.socket.id
+      }))
+    })
+  },[])
 
   useEffect(() => {
     gameData.socket.on('start_game', (roomData) => {
@@ -122,13 +132,19 @@ const App = () => {
           {gameData.playing && <Board />}
           {gameData.playing && <GameTimer />}
           {gameData.playing && <GameTurn />}
-          {<ChatBox />}
+          <ChatBox 
+            chatScope={'global'}
+            chatPeriod={'all'}
+          />
+          <ChatBox 
+            chatScope={'rooom1'}
+          />
         </div>
 
         
 
         <div className='fixed bottom-0'>
-          socket id : {gameData.socket.id} | Room : {gameData.roomID}
+          socket id : {gameData.socketID} | Room : {gameData.roomID}
         </div>
       </div>
     </GameContext.Provider>
