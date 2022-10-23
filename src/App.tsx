@@ -7,6 +7,7 @@ import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
+import GameResult from './components/GameResult'
 
 export const GameContext = createContext<any>({})
 
@@ -104,7 +105,8 @@ const App = () => {
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
-      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border'>
+      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border border-red-600'>
+        <GameResult />
         <div className='relative flex flex-col border'>
           <div className='mb-8 text-4xl text-center'>
             Welcome to Escape Plan
