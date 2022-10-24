@@ -73,6 +73,14 @@ const App = () => {
       }))
     })
 
+    gameData.socket.on('update_showResult', (showResult) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        showResult: showResult,
+      }))
+      onLog()
+    })
+
     gameData.socket.on('assign_role', (role) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
@@ -157,6 +165,17 @@ const App = () => {
             onClick={onLog}
           >
             LOG gameData
+          </button>
+          <button
+            className='m-1 py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
+            onClick={() => {
+              setGameData((prevGameData) => ({
+                ...prevGameData,
+                showResult: true,
+              }))
+            }}
+          >
+            showResult
           </button>
           <div className='text-center'>
             socket id : {gameData.socket.id} | Room : {gameData.roomID}

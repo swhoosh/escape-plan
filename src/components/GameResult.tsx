@@ -1,10 +1,22 @@
 import { RiVipCrownFill } from 'react-icons/ri'
+import { useContext } from 'react'
+import { GameContext } from '../App'
 
 const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
-  playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
-  playerInfos[0]['role'] = role
-  if (playerInfos.length > 1) {
-    playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+  const { gameData, setGameData } = useContext(GameContext)
+
+  if (playerInfos.length > 0) {
+    playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+    playerInfos[0]['role'] = role
+    if (playerInfos.length > 1) {
+      playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+    }
+  }
+
+  const onLeave = () => {
+    // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)
+    setGameData({ ...gameData, roomID: '' })
+    gameData.socket.emit('leave_room', gameData.roomID)
   }
 
   return (
@@ -37,6 +49,7 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
         <button
           className='result-button max-w-[100px] h-[30px] mt-3
          bg-drac_black shadow-drac_darkgrey/30 hover:bg-drac_darkgrey'
+          onClick={onLeave}
         >
           leave
         </button>
