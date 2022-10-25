@@ -5,8 +5,8 @@ import Board from './components/Board'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
+import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
-import { Socket } from 'dgram'
 import PlayerInfos from './components/PlayerInfos'
 
 export const GameContext = createContext<any>({})
@@ -18,7 +18,7 @@ const App = () => {
   // global state: gameData
   const [gameData, setGameData] = useState({
     // connect to server
-    socket: io('localhost:6050'),
+    socket: io('localhost:6050/'),
     name: '',
     roomID: '',
     showBoard: false,
@@ -28,6 +28,7 @@ const App = () => {
     roomData: {},
     gameTime: '0',
     chat: [],
+    socketID: '',
     showPlayerInfos: false,
     playerInfos: {},
     showResult: false,
@@ -36,6 +37,15 @@ const App = () => {
   const onLog = () => {
     console.log(gameData)
   }
+
+  useEffect(() => {
+    gameData.socket.on('connect', () => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        socketID: gameData.socket.id
+      }))
+    })
+  },[])
 
   useEffect(() => {
     gameData.socket.on('update_playerInfo', (playerInfos, showPlayerInfos) => {
@@ -161,7 +171,7 @@ const App = () => {
             LOG gameData
           </button>
           <div className='text-center'>
-            socket id : {gameData.socket.id} | Room : {gameData.roomID}
+            socket id : {gameData.socketID} | Room : {gameData.roomID}
           </div>
         </div>
       </div>

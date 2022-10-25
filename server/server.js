@@ -13,6 +13,7 @@ import { gameTimer } from './gameLogic/timer.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
+import { chatLogic } from './chat.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -27,7 +28,6 @@ const io = new Server(server, {
 // where we stored our data
 const all_rooms = {}
 var timerIntervalId = []
-var chatData = []
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
@@ -41,7 +41,7 @@ const print_rooms = () => {
       )
     }
   }
-}
+} 
 
 // get number of sockets in room
 const n_sockets_in_room = (roomID) => {
@@ -98,11 +98,15 @@ const skipTurn = (roomID) => {
   )
 }
 
+
+chatLogic(io)
+
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
   // console.log(`${socket.id} : ${io.engine.clientsCount}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
+  // chatLogic(io,socket)
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName) => {
@@ -229,6 +233,9 @@ io.on('connection', (socket) => {
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
     print_rooms()
   })
+
+
+  
 
   socket.on('disconnecting', () => {
     // console.log(socket.rooms) // the Set contains at least the socket ID
