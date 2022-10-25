@@ -52,6 +52,30 @@ const App = () => {
       }))
     })
 
+    gameData.socket.on('game_start', (roomData, playerInfos) => {
+      let role = ''
+      roomData.warder === gameData.socket.id
+        ? (role = 'warder')
+        : (role = 'prisoner')
+
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        roomData: roomData,
+        playerInfos: playerInfos,
+        showPlayerInfos: true,
+        showBoard: true,
+        playing: true,
+        role: role,
+        myTurn: role === 'warder',
+      }))
+    })
+
+    gameData.socket.on('player_leave_room', (socketID) => {
+      // is the player who leave
+      if (gameData.socket.id === socketID) {
+      }
+    })
+
     gameData.socket.on('update_roomData', (roomData) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
@@ -78,15 +102,7 @@ const App = () => {
         ...prevGameData,
         showResult: showResult,
       }))
-      onLog()
-    })
-
-    gameData.socket.on('assign_role', (role) => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        role: role,
-        myTurn: role === 'warder',
-      }))
+      // onLog()
     })
 
     gameData.socket.on('player_won', (role) => {
