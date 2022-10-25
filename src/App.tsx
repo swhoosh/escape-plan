@@ -3,7 +3,6 @@ import io from 'socket.io-client'
 
 import Board from './components/Board'
 import InputRoom from './components/InputRoom'
-import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
@@ -45,7 +44,7 @@ const App = () => {
         socketID: gameData.socket.id
       }))
     })
-  },[])
+  })
 
   useEffect(() => {
     gameData.socket.on('update_playerInfo', (playerInfos, showPlayerInfos) => {
@@ -219,6 +218,9 @@ const App = () => {
               {/* {gameData.playing && <GameTimer />} */}
               {gameData.playing && <GameTurn />}
             </div>
+            <ChatBox 
+              chatScope='global'
+            />
           </div>
         </div>
 

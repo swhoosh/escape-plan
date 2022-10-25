@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { io, Socket } from 'socket.io-client'
-import { isString } from 'util'
-import { createContext } from 'vm'
 import { GameContext } from '../App'
 import { socketChat } from '../service/ChatBoxSocket'
 
