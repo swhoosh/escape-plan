@@ -13,6 +13,7 @@ import { gameTimer } from './gameLogic/timer.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
+import e from 'express'
 import { chatLogic } from './chat.js'
 
 const app = express()
@@ -138,10 +139,16 @@ io.on('connection', (socket) => {
     // 2 players in room already
     if (n_sockets_in_room(roomID) === 2) {
       roomData = generate_new_roomData(roomID)
-      io.to(roomData.warder).emit('assign_role', 'warder')
-      io.to(roomData.prisoner).emit('assign_role', 'prisoner')
-      io.to(roomID).emit('update_roomData', roomData) // start the game
-      io.to(roomID).emit('update_playing', true) // start the game
+      // io.to(roomData.warder).emit('assign_role', 'warder')
+      // io.to(roomData.prisoner).emit('assign_role', 'prisoner')
+      // io.to(roomID).emit('update_roomData', roomData) // start the game
+      // io.to(roomID).emit('update_playing', true) // start the game
+      io.to(roomID).emit(
+        'game_start',
+        roomData,
+        all_rooms[roomID]['playerInfos']
+      )
+
       timerIntervalId[roomID] = gameTimer(
         io,
         roomID,
@@ -150,24 +157,36 @@ io.on('connection', (socket) => {
         skipTurn
       )
     }
+    // only 1 player game not started
+    else {
+      io.to(roomID).emit(
+        'update_playerInfo',
+        all_rooms[roomID]['playerInfos'],
+        true
+      )
+      io.to(roomID).emit('update_showBoard', true)
+    }
 
-    io.to(roomID).emit(
-      'update_playerInfo',
-      all_rooms[roomID]['playerInfos'],
-      true
-    )
-    io.to(roomID).emit('update_showBoard', true)
     print_rooms()
   })
 
   // ON LEAVE ROOM
   socket.on('leave_room', (roomID) => {
-    io.to(roomID).emit('update_playerInfo', {}, false)
-    io.to(roomID).emit('update_playing', false)
-    io.to(roomID).emit('update_showBoard', false)
-    socket.leave(roomID)
+    let roomData = { board: generateEmptyBoard() }
     clearInterval(timerIntervalId[roomID])
     update_player_infos(roomID, socket.id)
+    // io.to(roomID).emit('update_playerInfo', {}, false)
+    // io.to(roomID).emit('update_playing', false)
+    // io.to(roomID).emit('update_showBoard', false)
+    // io.to(roomID).emit('update_showResult', false)
+    io.to(roomID).emit(
+      'player_leave_room',
+      socket.id,
+      all_rooms[roomID]['playerInfos'],
+      roomData
+    )
+    socket.leave(roomID)
+
     print_rooms()
   })
 

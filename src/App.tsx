@@ -62,6 +62,67 @@ const App = () => {
       }))
     })
 
+    gameData.socket.on('game_start', (roomData, playerInfos) => {
+      // assign role
+      let role = ''
+      roomData.warder === gameData.socket.id
+        ? (role = 'warder')
+        : (role = 'prisoner')
+
+      // set priority for playerInfos
+      if (JSON.stringify(playerInfos) !== '{}') {
+        playerInfos[0].socketID === gameData.socket.id
+          ? (playerInfos[0].priority = 1)
+          : (playerInfos[1].priority = 1)
+      }
+
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        roomData: roomData,
+        playerInfos: playerInfos,
+        showPlayerInfos: true,
+        showBoard: true,
+        playing: true,
+        role: role,
+        myTurn: role === 'warder',
+      }))
+    })
+
+    gameData.socket.on(
+      'player_leave_room',
+      (socketID, playerInfos, roomData) => {
+        // is the player who leave
+        if (gameData.socket.id === socketID) {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            roomData: {},
+            playerInfos: {},
+            showPlayerInfos: false,
+            showBoard: false,
+            playing: false,
+            role: '',
+            myTurn: false,
+            showResult: false,
+          }))
+        }
+        // the opponent leave
+        else {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            roomData: roomData,
+            playerInfos: playerInfos,
+            showPlayerInfos: true,
+            showBoard: true,
+            playing: false,
+            role: '',
+            myTurn: false,
+            showResult: false,
+          }))
+        }
+        onLog()
+      }
+    )
+
     gameData.socket.on('update_roomData', (roomData) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
@@ -83,11 +144,10 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('assign_role', (role) => {
+    gameData.socket.on('update_showResult', (showResult) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
-        role: role,
-        myTurn: role === 'warder',
+        showResult: showResult,
       }))
     })
 
@@ -98,6 +158,7 @@ const App = () => {
         playing: false,
         showResult: true,
       }))
+      // onLog()
     })
 
     gameData.socket.on('timer', (gameTime) => {
@@ -126,11 +187,9 @@ const App = () => {
     return () => {
       //stop duplicate listener
       gameData.socket.off('update_playerInfo')
-      gameData.socket.off('update_roomData')
-      gameData.socket.off('update_showBoard')
-      gameData.socket.off('update_playing')
-      gameData.socket.off('assign_role')
+      gameData.socket.off('game_start')
       gameData.socket.off('player_won')
+      gameData.socket.off('player_leave_room')
       gameData.socket.off('timer')
       gameData.socket.off('your_turn')
       gameData.socket.off('skip_turn')
@@ -140,7 +199,7 @@ const App = () => {
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
-      <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center font-comfy'>
+      <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {gameData.showResult && (
           <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
         )}
@@ -169,6 +228,17 @@ const App = () => {
             onClick={onLog}
           >
             LOG gameData
+          </button>
+          <button
+            className='m-1 py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
+            onClick={() => {
+              setGameData((prevGameData) => ({
+                ...prevGameData,
+                showResult: true,
+              }))
+            }}
+          >
+            showResult
           </button>
           <div className='text-center'>
             socket id : {gameData.socketID} | Room : {gameData.roomID}

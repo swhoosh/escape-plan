@@ -1,15 +1,66 @@
-import React from 'react'
+import { RiVipCrownFill } from 'react-icons/ri'
+import { useContext } from 'react'
+import { GameContext } from '../App'
 
 const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
-  return (
-    <div
-      className='absolute flex w-1/2 h-1/2 z-50 rounded-3xl backdrop-blur-md
-     bg-drac_white/30 shadow-xl shadow-drac_white/10'
-    >
-      <>{role}</>
-      <>{playerInfos}</>
-    </div>
-  )
+  const { gameData, setGameData } = useContext(GameContext)
+
+  if (gameData.showResult) {
+    playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+    playerInfos[0]['role'] = role
+    if (playerInfos.length > 1) {
+      playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+    }
+  }
+
+  const onLeave = () => {
+    // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)
+    setGameData({ ...gameData, roomID: '' })
+    gameData.socket.emit('leave_room', gameData.roomID)
+  }
+
+  if (gameData.showResult)
+    return (
+      <div
+        className='absolute flex grow flex-col top-0 bottom-0 left-0 right-0 
+       m-auto p-10 w-1/2 max-w-[700px] h-[60%] max-h-[720px] justify-evenly
+       bg-drac_black rounded-xl z-50 border'
+      >
+        <div className='text-7xl text-center'>Victory</div>
+        <div className='grid grid-cols-2 gap-20'>
+          {playerInfos.map((playerInfo: any) => {
+            return (
+              <div
+                key={playerInfo.socketID}
+                className='grid grid-cols-2 grid-rows-2 break-all '
+              >
+                <div className='col-span-2 text-3xl m-auto'>
+                  {playerInfo.name}
+                </div>
+                <div className='m-auto text-xl text-center'>
+                  <RiVipCrownFill size={28} color='yellow' />
+                  {playerInfo.score}
+                </div>
+                <div className='text-xl m-auto text-center'>
+                  {playerInfo.role}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div className='relative flex flex-col'>
+          <button className='result-button'>Play Again?</button>
+          <button
+            className='result-button max-w-[100px] h-[30px] mt-3
+         bg-drac_black shadow-drac_darkgrey/30 hover:bg-drac_darkgrey'
+            onClick={onLeave}
+          >
+            leave
+          </button>
+        </div>
+      </div>
+    )
+  else return <div></div>
 }
 
 export default GameResult
