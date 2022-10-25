@@ -22,7 +22,10 @@ const PlayerInfos = ({
       {playing && <GameTimer />}
       {playerInfos.map((playerInfo: any) => {
         return (
-          <div className='grid grid-cols-2 grid-rows-2 break-all '>
+          <div
+            key={playerInfo.socketID}
+            className='grid grid-cols-2 grid-rows-2 break-all '
+          >
             <div className='flex text-3xl col-span-2 m-auto'>
               {playerInfo.name}
             </div>

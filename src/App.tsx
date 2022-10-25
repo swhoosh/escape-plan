@@ -53,10 +53,18 @@ const App = () => {
     })
 
     gameData.socket.on('game_start', (roomData, playerInfos) => {
+      // assign role
       let role = ''
       roomData.warder === gameData.socket.id
         ? (role = 'warder')
         : (role = 'prisoner')
+
+      // set priority for playerInfos
+      if (JSON.stringify(playerInfos) !== '{}') {
+        playerInfos[0].socketID === gameData.socket.id
+          ? (playerInfos[0].priority = 1)
+          : (playerInfos[1].priority = 1)
+      }
 
       setGameData((prevGameData) => ({
         ...prevGameData,
@@ -70,11 +78,40 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('player_leave_room', (socketID) => {
-      // is the player who leave
-      if (gameData.socket.id === socketID) {
+    gameData.socket.on(
+      'player_leave_room',
+      (socketID, playerInfos, roomData) => {
+        // is the player who leave
+        if (gameData.socket.id === socketID) {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            roomData: {},
+            playerInfos: {},
+            showPlayerInfos: false,
+            showBoard: false,
+            playing: false,
+            role: '',
+            myTurn: false,
+            showResult: false,
+          }))
+        }
+        // the opponent leave
+        else {
+          setGameData((prevGameData) => ({
+            ...prevGameData,
+            roomData: roomData,
+            playerInfos: playerInfos,
+            showPlayerInfos: true,
+            showBoard: true,
+            playing: false,
+            role: '',
+            myTurn: false,
+            showResult: false,
+          }))
+        }
+        onLog()
       }
-    })
+    )
 
     gameData.socket.on('update_roomData', (roomData) => {
       setGameData((prevGameData) => ({
@@ -102,7 +139,6 @@ const App = () => {
         ...prevGameData,
         showResult: showResult,
       }))
-      // onLog()
     })
 
     gameData.socket.on('player_won', (role) => {
@@ -112,6 +148,7 @@ const App = () => {
         playing: false,
         showResult: true,
       }))
+      // onLog()
     })
 
     gameData.socket.on('timer', (gameTime) => {
@@ -139,10 +176,10 @@ const App = () => {
 
     return () => {
       //stop duplicate listener
-      gameData.socket.off('start_game')
-      gameData.socket.off('assign_role')
-      gameData.socket.off('update_gameData')
+      gameData.socket.off('update_playerInfo')
+      gameData.socket.off('game_start')
       gameData.socket.off('player_won')
+      gameData.socket.off('player_leave_room')
       gameData.socket.off('timer')
       gameData.socket.off('your_turn')
       gameData.socket.off('skip_turn')

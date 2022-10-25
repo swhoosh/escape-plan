@@ -5,7 +5,7 @@ import { GameContext } from '../App'
 const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   const { gameData, setGameData } = useContext(GameContext)
 
-  if (playerInfos.length > 0) {
+  if (gameData.showResult) {
     playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
     playerInfos[0]['role'] = role
     if (playerInfos.length > 1) {
@@ -19,43 +19,48 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
     gameData.socket.emit('leave_room', gameData.roomID)
   }
 
-  return (
-    <div
-      className='absolute flex grow flex-col top-0 bottom-0 left-0 right-0 
+  if (gameData.showResult)
+    return (
+      <div
+        className='absolute flex grow flex-col top-0 bottom-0 left-0 right-0 
        m-auto p-10 w-1/2 max-w-[700px] h-[60%] max-h-[720px] justify-evenly
        bg-drac_black rounded-xl z-50 border'
-    >
-      <div className='text-7xl text-center'>Victory</div>
-      <div className='grid grid-cols-2 gap-20'>
-        {playerInfos.map((playerInfo: any) => {
-          return (
-            <div className='grid grid-cols-2 grid-rows-2 break-all '>
-              <div className='col-span-2 text-3xl m-auto'>
-                {playerInfo.name}
+      >
+        <div className='text-7xl text-center'>Victory</div>
+        <div className='grid grid-cols-2 gap-20'>
+          {playerInfos.map((playerInfo: any) => {
+            return (
+              <div
+                key={playerInfo.socketID}
+                className='grid grid-cols-2 grid-rows-2 break-all '
+              >
+                <div className='col-span-2 text-3xl m-auto'>
+                  {playerInfo.name}
+                </div>
+                <div className='m-auto text-xl text-center'>
+                  <RiVipCrownFill size={28} color='yellow' />
+                  {playerInfo.score}
+                </div>
+                <div className='text-xl m-auto text-center'>
+                  {playerInfo.role}
+                </div>
               </div>
-              <div className='m-auto text-xl text-center'>
-                <RiVipCrownFill size={28} color='yellow' />
-                {playerInfo.score}
-              </div>
-              <div className='text-xl m-auto text-center'>
-                {playerInfo.role}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      <div className='relative flex flex-col'>
-        <button className='result-button'>Play Again?</button>
-        <button
-          className='result-button max-w-[100px] h-[30px] mt-3
+            )
+          })}
+        </div>
+        <div className='relative flex flex-col'>
+          <button className='result-button'>Play Again?</button>
+          <button
+            className='result-button max-w-[100px] h-[30px] mt-3
          bg-drac_black shadow-drac_darkgrey/30 hover:bg-drac_darkgrey'
-          onClick={onLeave}
-        >
-          leave
-        </button>
+            onClick={onLeave}
+          >
+            leave
+          </button>
+        </div>
       </div>
-    </div>
-  )
+    )
+  else return <div></div>
 }
 
 export default GameResult

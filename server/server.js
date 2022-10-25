@@ -168,6 +168,7 @@ io.on('connection', (socket) => {
 
   // ON LEAVE ROOM
   socket.on('leave_room', (roomID) => {
+    let roomData = { board: generateEmptyBoard() }
     clearInterval(timerIntervalId[roomID])
     update_player_infos(roomID, socket.id)
     // io.to(roomID).emit('update_playerInfo', {}, false)
@@ -177,7 +178,8 @@ io.on('connection', (socket) => {
     io.to(roomID).emit(
       'player_leave_room',
       socket.id,
-      all_rooms[roomID]['playerInfos']
+      all_rooms[roomID]['playerInfos'],
+      roomData
     )
     socket.leave(roomID)
 
