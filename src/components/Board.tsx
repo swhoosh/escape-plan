@@ -6,14 +6,21 @@ const Board = () => {
   const { gameData } = useContext(GameContext)
 
   return (
-    <div className='relative m-4 p-10 justify-center items-center'>
-      <div className='text-2xl'>{gameData.role}</div>
-      <div className='relative flex flex-col aspect-square text-2xl border'>
+    <div className='relative justify-center items-center border'>
+      <div className='relative flex flex-col justify-evenly aspect-square text-2xl border'>
         {gameData.roomData.board.map((row: any, i: number) => {
           return (
-            <div className='flex border' key={i}>
+            <div className='flex flex-row justify-evenly' key={i}>
               {row.map((tile: any, j: number) => {
-                return <Tile key={j} tileValue={tile} i={i} j={j} myTurn = {gameData.myTurn}/>
+                return (
+                  <Tile
+                    key={j}
+                    tileValue={tile}
+                    i={i}
+                    j={j}
+                    myTurn={gameData.myTurn}
+                  />
+                )
               })}
             </div>
           )
@@ -38,17 +45,17 @@ const Tile = ({
 
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
-      if(gameData.myTurn == true){
+      if (gameData.myTurn) {
         gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
-        console.log('lets go')
+        console.log('LETS GOOOO')
         gameData.myTurn = false
-      } else {
-        console.log('not my turn')
       }
     }
   }
 
   const validMove = () => {
+    // not my turn
+    if (!gameData.myTurn) return false
     // tile is obstacle
     if (tileValue === 1) return false
     // player is warder
@@ -56,8 +63,7 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
-        tileValue === 2 ||
-        tileValue === 3
+        tileValue === 2
       )
         return false
     }
@@ -66,8 +72,7 @@ const Tile = ({
       if (
         Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
         Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
-        tileValue === 3 ||
-        tileValue === 4
+        tileValue === 3
       )
         return false
     }
@@ -85,53 +90,46 @@ const Tile = ({
   if (tileValue === 2)
     return (
       <button
-        className='tile bg-drac_green'
+        className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        <span className='m-auto text-xl'>Goal</span>
+        {/* <span className='m-auto text-xl'>Goal</span> */}
+        {/* {validMove() && <span className='dot'></span>} */}
       </button>
     )
   if (tileValue === 3)
     return (
       <button
-        className='tile bg-drac_red'
+        className='tile bg-drac_red group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      ></button>
+      >
+        {/* {validMove() && <span className='dot'></span>} */}
+      </button>
     )
   if (tileValue === 4)
     return (
       <button
-        className='tile bg-drac_cyan'
+        className='tile bg-drac_cyan group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      ></button>
+      >
+        {/* {validMove() && <span className='dot'></span>} */}
+      </button>
     )
-  else //normal block
-    if(myTurn) {
-      return (
-        <button
-          // className='tile bg-drac_lightgrey opacity-20 group'
-          className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
-          disabled={!validMove()}
-          onClick={handleOnClick}
-        >
-          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
-        </button>
-      )
-    } else {
-      return (
-        <button
-          // className='tile bg-drac_lightgrey opacity-20 group'
-          className='tile bg-drac_lightgrey opacity-40 disabled:opacity-20 group'
-          disabled={!validMove()}
-          onClick={handleOnClick}
-        >
-          <span className='w-5 h-5 m-auto bg-drac_grey rounded-full scale-0 group-hover:scale-100'></span>
-        </button>
-      )
-    }
+  //normal block
+  else
+    return (
+      <button
+        // className='tile bg-drac_lightgrey opacity-20 group'
+        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      >
+        {/* {validMove() && <span className='dot' />} */}
+      </button>
+    )
 }
 
 export default Board

@@ -2,12 +2,12 @@ import { useState, createContext, useMemo, useEffect } from 'react'
 import io from 'socket.io-client'
 
 import Board from './components/Board'
-import GameHeader from './components/GameHeader'
-import InputName from './components/InputName'
 import InputRoom from './components/InputRoom'
 import GameTimer from './components/GameTimer'
 import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
+import GameResult from './components/GameResult'
+import PlayerInfos from './components/PlayerInfos'
 
 export const GameContext = createContext<any>({})
 
@@ -21,13 +21,17 @@ const App = () => {
     socket: io('localhost:6050/'),
     name: '',
     roomID: '',
+    showBoard: false,
     playing: false,
     role: '',
     myTurn: false,
     roomData: {},
     gameTime: '0',
     chat: [],
-    socketID: ''
+    socketID: '',
+    showPlayerInfos: false,
+    playerInfos: {},
+    showResult: false,
   })
 
   const onLog = () => {
@@ -44,28 +48,46 @@ const App = () => {
   },[])
 
   useEffect(() => {
-    gameData.socket.on('start_game', (roomData) => {
+    gameData.socket.on('update_playerInfo', (playerInfos, showPlayerInfos) => {
+      if (JSON.stringify(playerInfos) !== '{}') {
+        playerInfos[0].socketID === gameData.socket.id
+          ? (playerInfos[0].priority = 1)
+          : (playerInfos[1].priority = 1)
+      }
+
       setGameData((prevGameData) => ({
         ...prevGameData,
-        playing: true,
+        playerInfos: playerInfos,
+        showPlayerInfos: showPlayerInfos,
+      }))
+    })
+
+    gameData.socket.on('update_roomData', (roomData) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
         roomData: roomData,
       }))
-      // console.log(gameData)
+    })
+
+    gameData.socket.on('update_showBoard', (showBoard) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        showBoard: showBoard,
+      }))
+    })
+
+    gameData.socket.on('update_playing', (playing) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        playing: playing,
+      }))
     })
 
     gameData.socket.on('assign_role', (role) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         role: role,
-        myTurn: role === 'warder'
-      }))
-    })
-
-    gameData.socket.on('update_roomData', (roomData) => {
-      // console.log(roomData)
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        roomData: roomData,
+        myTurn: role === 'warder',
       }))
     })
 
@@ -74,77 +96,83 @@ const App = () => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         playing: false,
+        showResult: true,
       }))
     })
 
-    gameData.socket.on('timer' , (gameTime) => {
-      setGameData(prevGameData => ({
+    gameData.socket.on('timer', (gameTime) => {
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        gameTime: gameTime
+        gameTime: gameTime,
       }))
     })
 
-    gameData.socket.on('your_turn',() => {
-      setGameData(prevGameData => ({
+    gameData.socket.on('your_turn', () => {
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        myTurn: true
+        myTurn: true,
       }))
       console.log('my turn')
     })
 
     gameData.socket.on('skip_turn', () => {
-      setGameData(prevGameData => ({
+      setGameData((prevGameData) => ({
         ...prevGameData,
-        myTurn: false
+        myTurn: false,
       }))
       console.log('skip turn')
     })
-    
-    return () => { //stop duplicate listener
-      gameData.socket.off('start_game');
-      gameData.socket.off('assign_role');
-      gameData.socket.off('update_gameData');
-      gameData.socket.off('player_won');
-      gameData.socket.off('timer');
-      gameData.socket.off('your_turn');
-      gameData.socket.off('skip_turn');
-    };
 
+    return () => {
+      //stop duplicate listener
+      gameData.socket.off('update_playerInfo')
+      gameData.socket.off('update_roomData')
+      gameData.socket.off('update_showBoard')
+      gameData.socket.off('update_playing')
+      gameData.socket.off('assign_role')
+      gameData.socket.off('player_won')
+      gameData.socket.off('timer')
+      gameData.socket.off('your_turn')
+      gameData.socket.off('skip_turn')
+    }
   }, [gameData]) // end useEffect
 
   return (
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
-      <div className='flex w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy border'>
-        <div className='relative flex flex-col border'>
-          <div className='mb-8 text-4xl text-center'>
-            Welcome to Escape Plan
-          </div>
-          {/* <InputName /> */}
+      <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center font-comfy'>
+        {gameData.showResult && (
+          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+        )}
+        <div className='relative flex-grow flex-col min-w-[320px] max-w-[1024px] border'>
+          <div className='mb-8 text-4xl text-center'>Escape Plan</div>
           <InputRoom />
+          <div className='grid grid-cols-4 gap-3'>
+            {gameData.showPlayerInfos && (
+              <PlayerInfos
+                playerInfos={gameData.playerInfos}
+                role={gameData.role}
+                playing={gameData.playing}
+              />
+            )}
+            <div className='col-span-2'>
+              {gameData.showBoard && <Board />}
+              {/* {gameData.playing && <GameTimer />} */}
+              {gameData.playing && <GameTurn />}
+            </div>
+          </div>
+        </div>
+
+        <div className='fixed flex flex-col bottom-0'>
           <button
-            className='w-1/2 mt-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold'
+            className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
             onClick={onLog}
           >
             LOG gameData
           </button>
-          {/* {gameData.playing && <GameHeader />} */}
-          {gameData.playing && <Board />}
-          {gameData.playing && <GameTimer />}
-          {gameData.playing && <GameTurn />}
-          {/* <ChatBox 
-            chatScope='rooom1'
-          /> */}
-        </div>
-        <ChatBox 
-            chatScope='global'
-            chatPeriod='all'
-        />
-
-        
-
-        <div className='fixed bottom-0'>
-          socket id : {gameData.socketID} | Room : {gameData.roomID}
+          <div className='text-center'>
+            socket id : {gameData.socketID} | Room : {gameData.roomID}
+          </div>
         </div>
       </div>
     </GameContext.Provider>

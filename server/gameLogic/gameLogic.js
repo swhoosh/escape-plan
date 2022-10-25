@@ -15,6 +15,10 @@ export const generateBoard = () => {
   return board
 }
 
+export const generateEmptyBoard = () => {
+  return createArray(grid_size)
+}
+
 const generateObstacle = (board) => {
   let n = 0
   while (n < max_obstacle) {

@@ -50,14 +50,14 @@ const InputRoom = () => {
   return (
     <div className='flex flex-col w-full mt-2 justify-between'>
       <input
-        className='appearance-none flex-initial m-auto w-1/2 py-2 pl-4 rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
+        className='appearance-none flex-initial m-auto py-2 pl-4 w-1/2 min-w-[170px] max-w-[200px] rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
         type='text'
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder='Enter your name'
       />
       <input
-        className='appearance-none flex-initial mt-4 m-auto w-1/2 py-2 pl-4 rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
+        className='appearance-none flex-initial mt-4 m-auto py-2 pl-4 w-1/2 min-w-[170px] max-w-[200px] rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
         type='number'
         value={roomID}
         onChange={(e) => setRoomID(e.target.value)}
@@ -65,7 +65,7 @@ const InputRoom = () => {
       />
       {!gameData.roomID && (
         <button
-          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_darkgreen hover:bg-drac_green rounded-full font-bold'
+          className='flex-initial w-[20%] max-w-[80px] mt-5 m-auto py-2 leading-tight bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40 rounded-full text-center font-bold'
           onClick={onJoin}
         >
           join
@@ -73,13 +73,13 @@ const InputRoom = () => {
       )}
       {gameData.roomID && !gameData.playing && (
         <button
-          className='flex-initial w-1/5 mt-5 m-auto py-2 px-4 leading-tight bg-drac_red hover:bg-drac_lightred rounded-full font-bold'
+          className='flex-initial w-[20%] max-w-[80px] mt-5 m-auto py-2 leading-tight bg-drac_red hover:bg-drac_lightred shadow-lg shadow-drac_red/40 rounded-full text-center font-bold'
           onClick={onLeave}
         >
           leave
         </button>
       )}
-      <div className='mt-3 m-auto'>{roomStatus}</div>
+      <div className='mt-3 m-auto text-md'>{roomStatus}</div>
     </div>
   )
 }

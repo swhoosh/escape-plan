@@ -14,6 +14,12 @@
 @layer components {
 
   .tile {
-    @apply flex aspect-square h-16 m-1 bg-drac_white text-drac_black rounded-lg shadow-md
+    @apply relative flex aspect-square w-[15%] bg-drac_white text-drac_black rounded-lg shadow-md 
+      enabled:hover:scale-125 transition-all duration-100
+  }
+
+  .dot {
+    @apply absolute w-5 h-5 left-0 right-0 top-0 bottom-0 m-auto
+     bg-drac_grey rounded-full scale-0 group-hover:scale-100
   }
 }
