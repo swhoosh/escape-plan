@@ -14,6 +14,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import e from 'express'
+import { chatLogic } from './chat.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -28,7 +29,6 @@ const io = new Server(server, {
 // where we stored our data
 const all_rooms = {}
 var timerIntervalId = []
-var chatData = []
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
@@ -42,7 +42,7 @@ const print_rooms = () => {
       )
     }
   }
-}
+} 
 
 // get number of sockets in room
 const n_sockets_in_room = (roomID) => {
@@ -99,11 +99,15 @@ const skipTurn = (roomID) => {
   )
 }
 
+
+chatLogic(io)
+
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
   // console.log(`${socket.id} : ${io.engine.clientsCount}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
+  // chatLogic(io,socket)
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName) => {
@@ -197,6 +201,7 @@ io.on('connection', (socket) => {
     if (roomData.warder === socket.id) {
       if (checkWin('warder', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'warder')
+        clearInterval(timerIntervalId[roomID])
       } else {
         const old_pos = roomData.warder_pos
         all_rooms[roomID].roomData.board[y][x] = 3 // move warder in board
@@ -206,10 +211,21 @@ io.on('connection', (socket) => {
 
         all_rooms[roomID]['roomData']['warder_pos'] = { x: x, y: y }
         all_rooms[roomID]['roomData']['turn'] = 'prisoner'
+
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          10,
+          skipTurn
+        )
+        socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
+        roomData.turn = 'prisoner'
       }
     } else if (roomData.prisoner === socket.id) {
       if (checkWin('prisoner', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'prisoner')
+        clearInterval(timerIntervalId[roomID])
       } else {
         const old_pos = roomData.prisoner_pos
         all_rooms[roomID].roomData.board[y][x] = 4 // move prisoner in board
@@ -219,20 +235,26 @@ io.on('connection', (socket) => {
 
         all_rooms[roomID]['roomData']['prisoner_pos'] = { x: x, y: y }
         all_rooms[roomID]['roomData']['turn'] = 'warder'
+
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          10,
+          skipTurn
+        )
+        socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
+        roomData.turn = 'warder'
       }
     }
 
-    timerIntervalId[roomID] = gameTimer(
-      io,
-      roomID,
-      timerIntervalId[roomID],
-      10,
-      skipTurn
-    )
+
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
-    socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
     print_rooms()
   })
+
+
+  
 
   socket.on('disconnecting', () => {
     // console.log(socket.rooms) // the Set contains at least the socket ID
