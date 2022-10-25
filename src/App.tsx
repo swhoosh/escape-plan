@@ -115,9 +115,11 @@ const App = () => {
 
     return () => {
       //stop duplicate listener
-      gameData.socket.off('start_game')
+      gameData.socket.off('update_playerInfo')
+      gameData.socket.off('update_roomData')
+      gameData.socket.off('update_showBoard')
+      gameData.socket.off('update_playing')
       gameData.socket.off('assign_role')
-      gameData.socket.off('update_gameData')
       gameData.socket.off('player_won')
       gameData.socket.off('timer')
       gameData.socket.off('your_turn')

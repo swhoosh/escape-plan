@@ -178,6 +178,7 @@ io.on('connection', (socket) => {
     if (roomData.warder === socket.id) {
       if (checkWin('warder', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'warder')
+        clearInterval(timerIntervalId[roomID])
       } else {
         const old_pos = roomData.warder_pos
         all_rooms[roomID].roomData.board[y][x] = 3 // move warder in board
@@ -187,10 +188,21 @@ io.on('connection', (socket) => {
 
         all_rooms[roomID]['roomData']['warder_pos'] = { x: x, y: y }
         all_rooms[roomID]['roomData']['turn'] = 'prisoner'
+
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          10,
+          skipTurn
+        )
+        socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
+        roomData.turn = 'prisoner'
       }
     } else if (roomData.prisoner === socket.id) {
       if (checkWin('prisoner', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'prisoner')
+        clearInterval(timerIntervalId[roomID])
       } else {
         const old_pos = roomData.prisoner_pos
         all_rooms[roomID].roomData.board[y][x] = 4 // move prisoner in board
@@ -200,18 +212,21 @@ io.on('connection', (socket) => {
 
         all_rooms[roomID]['roomData']['prisoner_pos'] = { x: x, y: y }
         all_rooms[roomID]['roomData']['turn'] = 'warder'
+
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          10,
+          skipTurn
+        )
+        socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
+        roomData.turn = 'warder'
       }
     }
 
-    timerIntervalId[roomID] = gameTimer(
-      io,
-      roomID,
-      timerIntervalId[roomID],
-      10,
-      skipTurn
-    )
+
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
-    socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
     print_rooms()
   })
 
