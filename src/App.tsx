@@ -41,7 +41,7 @@ const App = () => {
     gameData.socket.on('connect', () => {
       setGameData((prevGameData) => ({
         ...prevGameData,
-        socketID: gameData.socket.id
+        socketID: gameData.socket.id,
       }))
     })
   })
@@ -218,9 +218,7 @@ const App = () => {
               {/* {gameData.playing && <GameTimer />} */}
               {gameData.playing && <GameTurn />}
             </div>
-            <ChatBox 
-              chatScope='global'
-            />
+            <ChatBox chatScope='global' />
           </div>
         </div>
 
