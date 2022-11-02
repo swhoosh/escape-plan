@@ -152,10 +152,7 @@ io.on('connection', (socket) => {
     // 2 players in room already
     if (n_sockets_in_room(roomID) === 2) {
       roomData = generate_new_roomData(roomID)
-      // io.to(roomData.warder).emit('assign_role', 'warder')
-      // io.to(roomData.prisoner).emit('assign_role', 'prisoner')
-      // io.to(roomID).emit('update_roomData', roomData) // start the game
-      // io.to(roomID).emit('update_playing', true) // start the game
+
       io.to(roomID).emit(
         'game_start',
         roomData,
@@ -251,6 +248,7 @@ io.on('connection', (socket) => {
     print_rooms()
   })
 
+  // on client refresh / close
   socket.on('disconnecting', () => {
     // console.log(socket.rooms) // the Set contains at least the socket ID
     socket.rooms.forEach((roomID) => {
