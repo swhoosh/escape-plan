@@ -1,6 +1,9 @@
 // run : npm run start
 
 import util from 'util'
+import express from 'express'
+import http from 'http'
+import { Server } from 'socket.io'
 
 import {
   generateBoard,
@@ -10,10 +13,6 @@ import {
   checkWin,
 } from './gameLogic/gameLogic.js'
 import { gameTimer } from './gameLogic/timer.js'
-import express from 'express'
-import http from 'http'
-import { Server } from 'socket.io'
-import e from 'express'
 import { chatLogic } from './chat.js'
 
 const app = express()
@@ -26,7 +25,7 @@ const io = new Server(server, {
   },
 })
 
-// where we stored our data
+// where we store our data
 const all_rooms = {}
 var timerIntervalId = []
 
@@ -42,15 +41,13 @@ const print_rooms = () => {
       )
     }
   }
-} 
+}
 
 // get number of sockets in room
 const n_sockets_in_room = (roomID) => {
-  let n = 0
-  if (io.sockets.adapter.rooms.has(roomID)) {
-    n = io.sockets.adapter.rooms.get(roomID).size
-  }
-  return n
+  if (!(roomID in all_rooms)) return
+
+  return Object.keys(all_rooms[roomID]['playerInfos']).length
 }
 
 const update_player_infos = async (roomID, socketID) => {
@@ -99,6 +96,22 @@ const skipTurn = (roomID) => {
   )
 }
 
+const handle_leave_room = (roomID, socketID) => {
+  // if there is no roomID in all_rooms do nothing
+  if (!(roomID in all_rooms)) return
+
+  let roomData = { board: generateEmptyBoard() }
+  clearInterval(timerIntervalId[roomID])
+  update_player_infos(roomID, socketID)
+  io.to(roomID).emit(
+    'player_leave_room',
+    socketID,
+    roomID in all_rooms ? all_rooms[roomID]['playerInfos'] : {},
+    roomData
+  )
+
+  print_rooms()
+}
 
 chatLogic(io)
 
@@ -172,22 +185,8 @@ io.on('connection', (socket) => {
 
   // ON LEAVE ROOM
   socket.on('leave_room', (roomID) => {
-    let roomData = { board: generateEmptyBoard() }
-    clearInterval(timerIntervalId[roomID])
-    update_player_infos(roomID, socket.id)
-    // io.to(roomID).emit('update_playerInfo', {}, false)
-    // io.to(roomID).emit('update_playing', false)
-    // io.to(roomID).emit('update_showBoard', false)
-    // io.to(roomID).emit('update_showResult', false)
-    io.to(roomID).emit(
-      'player_leave_room',
-      socket.id,
-      all_rooms[roomID]['playerInfos'],
-      roomData
-    )
+    handle_leave_room(roomID, socket.id)
     socket.leave(roomID)
-
-    print_rooms()
   })
 
   // ON CLICK TILE
@@ -248,21 +247,15 @@ io.on('connection', (socket) => {
       }
     }
 
-
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
     print_rooms()
   })
 
-
-  
-
   socket.on('disconnecting', () => {
     // console.log(socket.rooms) // the Set contains at least the socket ID
-    // socket.rooms.forEach((room) => {
-    // console.log('DISCONNECT', room)
-    // update_player_infos(room, socket.id)
-    // })
-    // print_rooms()
+    socket.rooms.forEach((roomID) => {
+      handle_leave_room(roomID, socket.id)
+    })
   })
 
   //end on connect

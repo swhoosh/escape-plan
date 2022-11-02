@@ -18,6 +18,7 @@ const App = () => {
   const [gameData, setGameData] = useState({
     // connect to server
     socket: io('localhost:6050/'),
+    socketID: '',
     name: '',
     roomID: '',
     showBoard: false,
@@ -27,7 +28,6 @@ const App = () => {
     roomData: {},
     gameTime: '0',
     chat: [],
-    socketID: '',
     showPlayerInfos: false,
     playerInfos: {},
     showResult: false,
@@ -47,6 +47,10 @@ const App = () => {
   })
 
   useEffect(() => {
+    gameData.socket.on('disconnect', () => {
+      gameData.socket.emit('player_disconnect', gameData.roomID)
+    })
+
     gameData.socket.on('update_playerInfo', (playerInfos, showPlayerInfos) => {
       if (JSON.stringify(playerInfos) !== '{}') {
         playerInfos[0].socketID === gameData.socket.id
@@ -118,7 +122,6 @@ const App = () => {
             showResult: false,
           }))
         }
-        onLog()
       }
     )
 
