@@ -202,26 +202,32 @@ const App = () => {
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
-        {gameData.showResult && (
+        {gameData.showResult ? (
           <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
-        )}
-        <div className='relative flex-grow flex-col min-w-[320px] max-w-[1024px] border'>
-          <div className='mb-8 text-4xl text-center'>Escape Plan</div>
-          <InputRoom />
-          <div className='grid grid-cols-4 gap-3'>
-            {gameData.showPlayerInfos && (
+        ) : null}
+
+        <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center border'>
+          <div className='bg-blue-200'>
+            <div className='text-[5vh] text-center'>Escape Plan</div>
+            <InputRoom />
+          </div>
+
+          <div className='relative grid grid-cols-4 gap-3 justify-around items-center bg-slate-800'>
+            {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}
                 role={gameData.role}
                 playing={gameData.playing}
               />
-            )}
+            ) : null}
+
             <div className='col-span-2'>
-              {gameData.showBoard && <Board />}
+              {gameData.showBoard ? <Board /> : null}
               {/* {gameData.playing && <GameTimer />} */}
-              {gameData.playing && <GameTurn />}
+              {/* {gameData.playing ? <GameTurn /> : null} */}
             </div>
-            <ChatBox chatScope='global' />
+
+            {gameData.showBoard ? <ChatBox chatScope='global' /> : null}
           </div>
         </div>
 
@@ -231,17 +237,6 @@ const App = () => {
             onClick={onLog}
           >
             LOG gameData
-          </button>
-          <button
-            className='m-1 py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
-            onClick={() => {
-              setGameData((prevGameData) => ({
-                ...prevGameData,
-                showResult: true,
-              }))
-            }}
-          >
-            showResult
           </button>
           <div className='text-center'>
             socket id : {gameData.socketID} | Room : {gameData.roomID}

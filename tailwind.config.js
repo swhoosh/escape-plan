@@ -2,6 +2,9 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
+    screens: {
+      tiny: '440px',
+    },
     extend: {
       colors: {
         drac_black: '#282a36',
@@ -24,5 +27,6 @@ module.exports = {
       fontFamily: { comfy: 'Comfortaa' },
     },
   },
+
   plugins: [],
 }

@@ -18,7 +18,7 @@ const PlayerInfos = ({
   }
 
   return (
-    <div className='relative flex flex-col p-[10%] justify-between border'>
+    <div className='relative flex flex-col p-[5%] h-[100%] justify-between border'>
       {playing && <GameTimer />}
       {playerInfos.map((playerInfo: any) => {
         return (
@@ -26,14 +26,16 @@ const PlayerInfos = ({
             key={playerInfo.socketID}
             className='grid grid-cols-2 grid-rows-2 break-all '
           >
-            <div className='flex text-3xl col-span-2 m-auto'>
+            <div className='flex text-[4vh] col-span-2 m-auto'>
               {playerInfo.name}
             </div>
-            <div className='m-auto text-xl text-center'>
+            <div className='m-auto text-[2vh] text-center'>
               <RiVipCrownFill size={28} color='yellow' />
               {playerInfo.score}
             </div>
-            <div className='text-xl m-auto text-center'>{playerInfo.role}</div>
+            <div className='text-[2vh] m-auto text-center'>
+              {playerInfo.role}
+            </div>
           </div>
         )
       })}
