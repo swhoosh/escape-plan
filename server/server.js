@@ -14,16 +14,20 @@ import {
 } from './gameLogic/gameLogic.js'
 import { gameTimer } from './gameLogic/timer.js'
 import { chatLogic } from './chat.js'
+import { adminLogic } from './admin.js'
 
 const app = express()
 const server = http.createServer(app)
 const PORT = 6050
+const ADMINPORT = 8000
 const io = new Server(server, {
   cors: {
-    // origin: 'http://localhost:3000', // front-end
     origin: '*', // front-end
   },
 })
+
+chatLogic(io)
+adminLogic(app,ADMINPORT)
 
 // where we store our data
 const all_rooms = {}
@@ -112,8 +116,6 @@ const handle_leave_room = (roomID, socketID) => {
 
   print_rooms()
 }
-
-chatLogic(io)
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
