@@ -4,6 +4,8 @@ import util from 'util'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
+import path from 'path'
+import {fileURLToPath} from 'url';
 
 import {
   generateBoard,
@@ -23,11 +25,16 @@ const ADMINPORT = 8000
 const io = new Server(server, {
   cors: {
     origin: '*', // front-end
-  },
+  }, 
 })
 
-chatLogic(io)
-adminLogic(app,ADMINPORT)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, 'public')));
+//body parser
+app.use(express.json());
 
 // where we store our data
 const all_rooms = {}
@@ -115,6 +122,10 @@ const handle_leave_room = (roomID, socketID) => {
   )
 
   print_rooms()
+}
+
+const resetRoom = () => {
+  //todo
 }
 
 // ON CLIENT CONNECTION
@@ -260,6 +271,9 @@ io.on('connection', (socket) => {
 
   //end on connect
 })
+
+chatLogic(io)
+adminLogic(app,io,ADMINPORT,resetRoom)
 
 server.listen(PORT, () => {
   console.log(`[SERVER] listening on port ${PORT}`)

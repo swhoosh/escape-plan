@@ -1,10 +1,20 @@
-export const adminLogic = (app,ADMINPORT) => {
+export const adminLogic = (app,io,ADMINPORT,resetRoom) => {
+  app.get('/', (req, res) => {
+      res.render('index', { title: 'Escape Plan Admin' })
+  })
+    
+  app.listen(ADMINPORT, () => {
+    console.log(`[ADMIN SERVER] listening on port ${ADMINPORT}`)
+  })
 
-    app.get('/', (req, res) => {
-        res.send('')
-    })
+  io.of('/admin').on('connection', (socket) => {
+    // console.log(socket.id + ' connected to /admin')
 
-    app.listen(ADMINPORT, () => {
-        console.log(`Example app listening on port ${ADMINPORT}`)
+    socket.emit('update player count', 3)
+
+    socket.on('reset room', (roomID)=> {
+      console.log(`reset room ${roomID}`)
+      resetRoom(roomID)
     })
+  })
 }
