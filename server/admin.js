@@ -10,7 +10,7 @@ export const adminLogic = (app,io,ADMINPORT,resetRoom) => {
   io.of('/admin').on('connection', (socket) => {
     // console.log(socket.id + ' connected to /admin')
 
-    socket.emit('update player count', 3)
+    socket.emit('update player count', io.of("/").sockets.size)
 
     socket.on('reset room', (roomID)=> {
       console.log(`reset room ${roomID}`)

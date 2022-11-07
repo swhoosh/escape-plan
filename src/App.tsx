@@ -19,7 +19,6 @@ const App = () => {
   const [gameData, setGameData] = useState({
     // connect to server
     socket: socketMain,
-    socketID: '',
     name: '',
     roomID: '',
     showBoard: false,
@@ -41,9 +40,8 @@ const App = () => {
   useEffect(() => {
 
     gameData.socket.on('connect', () => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        socketID: gameData.socket.id,
+      setGameData((prevGameData) => ({ //make page refresh on connect
+        ...prevGameData
       }))
     })
 
@@ -244,7 +242,7 @@ const App = () => {
             showResult
           </button>
           <div className='text-center'>
-            socket id : {gameData.socketID} | Room : {gameData.roomID}
+            socket id : {gameData.socket.id} | Room : {gameData.roomID}
           </div>
         </div>
       </div>

@@ -130,10 +130,11 @@ const resetRoom = () => {
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
-  // console.log(`${socket.id} : ${io.engine.clientsCount}`)
+  // console.log(`${socket.id} : ${io.engine.clientsCount - 1}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
-  // chatLogic(io,socket)
+  io.of('/admin').emit('update player count', io.of("/").sockets.size)
+  // console.log(`socket connected ${io.of("/").sockets.size}`)
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName) => {
@@ -267,6 +268,8 @@ io.on('connection', (socket) => {
     socket.rooms.forEach((roomID) => {
       handle_leave_room(roomID, socket.id)
     })
+    io.of('/admin').emit('update player count', io.of("/").sockets.size - 1)
+    // console.log(`socket disconnected ${io.of("/").sockets.size - 1}`)
   })
 
   //end on connect

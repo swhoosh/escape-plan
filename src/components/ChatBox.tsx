@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { GameContext } from '../App'
-import { socketChat } from '../service/ChatBoxSocket'
+import { socketChat } from '../service/socket'
 
 
 type ChatBoxProps = {
@@ -62,7 +62,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({chatScope,chatPeriod}) => {
     return () => {
       socketChat.off("set chat")
       socketChat.off("append chat")
-      socketChat.disconnect()
     }
   }, [])
 
