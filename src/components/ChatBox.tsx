@@ -62,6 +62,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({chatScope,chatPeriod}) => {
     return () => {
       socketChat.off("set chat")
       socketChat.off("append chat")
+      socketChat.disconnect()
     }
   }, [])
 

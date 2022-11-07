@@ -195,8 +195,9 @@ const App = () => {
       gameData.socket.off('timer')
       gameData.socket.off('your_turn')
       gameData.socket.off('skip_turn')
+      gameData.socket.disconnect()
     }
-  }, [gameData]) // end useEffect
+  }) // end useEffect
 
   return (
     // Provide GameContext for the whole app
