@@ -124,20 +124,36 @@ const handle_leave_room = (roomID, socketID) => {
   print_rooms()
 }
 
-const resetRoom = (roomID) => {
-  if (!(roomID in all_rooms)) return
-  //todo
-  //wait for reset game and use that logic here
+const startRoom = (roomID) => {
+  let roomData = generate_new_roomData(roomID)
 
+  io.to(roomID).emit(
+    'game_start',
+    roomData,
+    all_rooms[roomID]['playerInfos']
+  )
 
-  // all_rooms[roomID]['playerInfos'].map(playerInfo => playerInfo.socketID).forEach((socketID) => {
-  //   var socket = io.sockets.sockets.get(socketID)
-  //   socket.leave(roomID)
-  //   socket.join(roomID)
-  //   console.log('left and joined')
-  // })
-  // console.log(all_rooms[roomID]['playerInfos'].map(playerInfo => playerInfo.socketID))
+  timerIntervalId[roomID] = gameTimer(
+    io,
+    roomID,
+    timerIntervalId[roomID],
+    10,
+    skipTurn
+  )
 }
+
+const resetScore = (roomID) => {
+  for(const [key] of Object.entries(all_rooms[roomID]['playerInfos'])) all_rooms[roomID]['playerInfos'][key]['score'] = 0
+}
+
+const resetRoom = (roomID) => {
+  if (!(roomID in all_rooms)) return 'room does not exist'
+  if (n_sockets_in_room(roomID) !== 2) return 'game not start yet'
+  resetScore(roomID)
+  startRoom(roomID)
+  return `reset room ${roomID} successful`
+}
+
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {

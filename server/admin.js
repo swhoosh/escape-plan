@@ -14,7 +14,7 @@ export const adminLogic = (app,io,ADMINPORT,resetRoom) => {
 
     socket.on('reset room', (roomID)=> {
       console.log(`reset room ${roomID}`)
-      resetRoom(roomID)
+      socket.emit('reset result',resetRoom(roomID),roomID)
     })
   })
 }
