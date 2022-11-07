@@ -7,7 +7,7 @@ import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'
-import { socketMain } from './service/mainSocket'
+import { socketMain } from './service/socket'
 
 export const GameContext = createContext<any>({})
 
