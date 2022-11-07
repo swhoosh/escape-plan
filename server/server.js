@@ -124,8 +124,19 @@ const handle_leave_room = (roomID, socketID) => {
   print_rooms()
 }
 
-const resetRoom = () => {
+const resetRoom = (roomID) => {
+  if (!(roomID in all_rooms)) return
   //todo
+  //wait for reset game and use that logic here
+
+
+  // all_rooms[roomID]['playerInfos'].map(playerInfo => playerInfo.socketID).forEach((socketID) => {
+  //   var socket = io.sockets.sockets.get(socketID)
+  //   socket.leave(roomID)
+  //   socket.join(roomID)
+  //   console.log('left and joined')
+  // })
+  // console.log(all_rooms[roomID]['playerInfos'].map(playerInfo => playerInfo.socketID))
 }
 
 // ON CLIENT CONNECTION
