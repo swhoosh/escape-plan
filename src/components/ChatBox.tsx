@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { GameContext } from '../App'
-import { socketChat } from '../service/ChatBoxSocket'
+import { socketChat } from '../service/socket'
 
 
 type ChatBoxProps = {

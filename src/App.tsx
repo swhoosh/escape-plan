@@ -7,6 +7,7 @@ import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'
+import { socketMain } from './service/socket'
 
 export const GameContext = createContext<any>({})
 
@@ -17,8 +18,7 @@ const App = () => {
   // global state: gameData
   const [gameData, setGameData] = useState({
     // connect to server
-    socket: io('localhost:6050/'),
-    socketID: '',
+    socket: socketMain,
     name: '',
     roomID: '',
     showBoard: false,
@@ -38,15 +38,13 @@ const App = () => {
   }
 
   useEffect(() => {
+
     gameData.socket.on('connect', () => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        socketID: gameData.socket.id,
+      setGameData((prevGameData) => ({ //make page refresh on connect
+        ...prevGameData
       }))
     })
-  })
 
-  useEffect(() => {
     gameData.socket.on('disconnect', () => {
       gameData.socket.emit('player_disconnect', gameData.roomID)
     })
@@ -196,7 +194,7 @@ const App = () => {
       gameData.socket.off('your_turn')
       gameData.socket.off('skip_turn')
     }
-  }, [gameData]) // end useEffect
+  }, []) // end useEffect
 
   return (
     // Provide GameContext for the whole app
@@ -244,7 +242,7 @@ const App = () => {
             showResult
           </button>
           <div className='text-center'>
-            socket id : {gameData.socketID} | Room : {gameData.roomID}
+            socket id : {gameData.socket.id} | Room : {gameData.roomID}
           </div>
         </div>
       </div>

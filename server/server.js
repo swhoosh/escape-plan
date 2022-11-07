@@ -4,6 +4,8 @@ import util from 'util'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
+import path from 'path'
+import {fileURLToPath} from 'url';
 
 import {
   generateBoard,
@@ -14,16 +16,25 @@ import {
 } from './gameLogic/gameLogic.js'
 import { gameTimer } from './gameLogic/timer.js'
 import { chatLogic } from './chat.js'
+import { adminLogic } from './admin.js'
 
 const app = express()
 const server = http.createServer(app)
 const PORT = 6050
+const ADMINPORT = 8000
 const io = new Server(server, {
   cors: {
-    // origin: 'http://localhost:3000', // front-end
     origin: '*', // front-end
-  },
+  }, 
 })
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, 'public')));
+//body parser
+app.use(express.json());
 
 // where we store our data
 const all_rooms = {}
@@ -113,14 +124,44 @@ const handle_leave_room = (roomID, socketID) => {
   print_rooms()
 }
 
-chatLogic(io)
+const startRoom = (roomID) => {
+  let roomData = generate_new_roomData(roomID)
+
+  io.to(roomID).emit(
+    'game_start',
+    roomData,
+    all_rooms[roomID]['playerInfos']
+  )
+
+  timerIntervalId[roomID] = gameTimer(
+    io,
+    roomID,
+    timerIntervalId[roomID],
+    10,
+    skipTurn
+  )
+}
+
+const resetScore = (roomID) => {
+  for(const [key] of Object.entries(all_rooms[roomID]['playerInfos'])) all_rooms[roomID]['playerInfos'][key]['score'] = 0
+}
+
+const resetRoom = (roomID) => {
+  if (!(roomID in all_rooms)) return 'room does not exist'
+  if (n_sockets_in_room(roomID) !== 2) return 'game not start yet'
+  resetScore(roomID)
+  startRoom(roomID)
+  return `reset room ${roomID} successful`
+}
+
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
-  // console.log(`${socket.id} : ${io.engine.clientsCount}`)
+  // console.log(`${socket.id} : ${io.engine.clientsCount - 1}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
-  // chatLogic(io,socket)
+  io.of('/admin').emit('update player count', io.of("/").sockets.size)
+  // console.log(`socket connected ${io.of("/").sockets.size}`)
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName) => {
@@ -254,10 +295,15 @@ io.on('connection', (socket) => {
     socket.rooms.forEach((roomID) => {
       handle_leave_room(roomID, socket.id)
     })
+    io.of('/admin').emit('update player count', io.of("/").sockets.size - 1)
+    // console.log(`socket disconnected ${io.of("/").sockets.size - 1}`)
   })
 
   //end on connect
 })
+
+chatLogic(io)
+adminLogic(app,io,ADMINPORT,resetRoom)
 
 server.listen(PORT, () => {
   console.log(`[SERVER] listening on port ${PORT}`)
