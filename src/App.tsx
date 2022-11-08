@@ -8,6 +8,7 @@ import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'
 import { socketMain } from './service/socket'
+import BigNotice from './components/BigNotice'
 
 export const GameContext = createContext<any>({})
 
@@ -32,6 +33,8 @@ const App = () => {
     playerInfos: {},
     showResult: false,
   })
+
+  const [ noticeText,setNoticeText ] = useState('')
 
   const onLog = () => {
     console.log(gameData)
@@ -119,6 +122,8 @@ const App = () => {
             myTurn: false,
             showResult: false,
           }))
+          setNoticeText('other player left')
+          setTimeout(() => {setNoticeText('')},1500)
         }
       }
     )
@@ -246,6 +251,7 @@ const App = () => {
           </div>
         </div>
       </div>
+      { noticeText !== '' &&  <BigNotice text={`${noticeText}`}></BigNotice>}
     </GameContext.Provider>
   )
 }
