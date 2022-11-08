@@ -24,8 +24,8 @@
   
   .result-button {
     @apply flex grow w-1/3 min-w-[88px] max-w-[172px] h-[50px] m-auto py-2 
-    leading-tight bg-drac_darkgreen hover:bg-drac_green 
-    shadow-md shadow-drac_green/40 rounded-md text-xl text-center font-bold
+    leading-tight 
+     rounded-md text-xl text-center font-bold 
   }
 
   .input-box {
@@ -43,3 +43,4 @@
      scale-90 hover:scale-100 duration-100
   }
 }
+ 

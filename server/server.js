@@ -95,7 +95,7 @@ const generate_new_roomData = (roomID) => {
 
 const skipTurn = (roomID) => {
   const roomData = all_rooms[roomID]['roomData']
-  console.log(roomData)
+  // console.log(roomData)
   io.to(roomData[roomData['turn']]).emit('skip_turn')
   all_rooms[roomID]['roomData']['turn'] =
     roomData['turn'] === 'warder' ? 'prisoner' : 'warder'
@@ -156,6 +156,17 @@ const resetRoom = (roomID) => {
   return `reset room ${roomID} successful`
 }
 
+const reMatch = (roomID) => {
+  if (!(roomID in all_rooms)) return
+  if (n_sockets_in_room(roomID) !== 2) return
+  startRoom(roomID)
+  io.to(roomID).emit(
+    'update_showResult',
+    false
+  )
+  return
+}
+
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
@@ -181,6 +192,7 @@ io.on('connection', (socket) => {
       socketID: socket.id,
       score: 0,
       priority: 0,
+      reMatch: false
     }
 
     // create room when no room, if already has a player in room push new player
@@ -289,6 +301,28 @@ io.on('connection', (socket) => {
 
     io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
     print_rooms()
+  })
+
+  socket.on('rematch', (roomID) => {
+    //set want to rematch
+    all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => {
+      if(playerInfo['socketID'] === socket.id) return {
+        ...playerInfo,
+        reMatch : true
+      }; 
+      else return playerInfo
+    })
+
+    socket.to(roomID).emit('rematch request')
+
+    if(all_rooms[roomID]['playerInfos'][0]['reMatch'] + all_rooms[roomID]['playerInfos'][1]['reMatch'] == 2) {
+      reMatch(roomID)
+      all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => ({
+          ...playerInfo,
+          reMatch : false
+      }))
+    }
+
   })
 
   // on client refresh / close
