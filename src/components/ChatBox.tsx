@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
+
 import { GameContext } from '../App'
 import { socketChat } from '../service/socket'
 import TauntButton from './TauntButton'
@@ -166,11 +167,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
       ></input>
 
       <button
-        className='join-leave-button rounded-xl bg-drac_pink'
+        className='join-leave-button w-[25%] rounded-xl bg-drac_pink'
         onClick={sendMessage}
       >
-        <div className='m-auto'>send</div>
+        <div className='m-auto text-[2vh]'>send</div>
       </button>
+
       <TauntButton />
     </div>
   )

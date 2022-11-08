@@ -1,8 +1,10 @@
 import React, { useContext } from 'react'
 import { GameContext } from '../App'
+import { RiEmotionFill } from 'react-icons/ri'
 
 export default function TauntButton() {
   const { gameData } = useContext(GameContext)
+
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       gameData.socket.emit('taunt', gameData.roomID)
@@ -11,9 +13,11 @@ export default function TauntButton() {
   return (
     <button
       onClick={handleOnClick}
-      className='join-leave-button bg-purple-500 rounded-xl'
+      className='join-leave-button w-[25%] bg-purple-500 rounded-xl'
     >
-      <div className='m-auto'>taunt</div>
+      <div className='m-auto'>
+        <RiEmotionFill size={25} color='white' />
+      </div>
     </button>
   )
 }
