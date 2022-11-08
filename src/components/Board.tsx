@@ -17,13 +17,15 @@ const Board = () => {
             ? 'prisoner'
             : ''
         setShowTaunt(newTaunt)
-        setTimeout(() => {
-          setShowTaunt('')
-        }, 1000)
       })
       return () => gameData.socket.off('taunt_display')
     }
-  }, [gameData.socket])
+  }, [gameData])
+  React.useEffect(() => {
+    if (showTaunt !== '') {
+      setTimeout(() => setShowTaunt(''), 1000)
+    }
+  }, [showTaunt])
 
   return (
     <div className='relative flex flex-col justify-evenly m-auto max-w-full aspect-square text-2xl border'>
@@ -109,6 +111,7 @@ const Tile = ({
       setTimeout(() => setActivateTaunt(false), 1500)
     }
   }, [showTaunt])
+
   useEffect(() => {
     if (activateTaunt) {
       setTimeout(() => setTransition(true), 100)
