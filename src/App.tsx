@@ -207,12 +207,12 @@ const App = () => {
         ) : null}
 
         <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center border'>
-          <div className='bg-blue-200'>
+          <div className=''>
             <div className='text-[5vh] text-center'>Escape Plan</div>
             <InputRoom />
           </div>
 
-          <div className='relative grid grid-cols-4 bg-slate-800'>
+          <div className='relative grid grid-cols-4'>
             {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}

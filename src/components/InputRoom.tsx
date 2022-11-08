@@ -70,7 +70,7 @@ const InputRoom = () => {
 
       {!gameData.roomID && (
         <button
-          className={`join-leave-button  bg-drac_darkgreen hover:bg-drac_green
+          className={`join-leave-button  bg-drac_darkgreen
            shadow-lg shadow-drac_green/40
           ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onJoin}

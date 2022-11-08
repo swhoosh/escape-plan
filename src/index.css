@@ -40,5 +40,6 @@
     @apply flex grow w-[40%] max-w-[70px] py-2 leading-tight
      /* bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40  */
      rounded-full text-center font-bold
+     hover:scale-125 transition-all duration-100
   }
 }

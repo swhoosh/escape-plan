@@ -107,14 +107,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
   }
 
   return (
-    <div className='flex h-full w-full border'>
+    <div className='relative flex flex-col h-full w-full border'>
       {/* <button className='w-1/2 mb-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold' onClick={logChat}>
       log chat
       </button> */}
-      <div className='relative flex flex-col'>
-        {chat()}
-        <ChatInput chatScope={chatScope} />
-      </div>
+      {chat()}
+      <ChatInput chatScope={chatScope} />
     </div>
   )
 }
@@ -138,9 +136,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   }
 
   return (
-    <div className='absolute bottom-0 flex flex-row'>
+    <div className='absolute bottom-0 flex grow flex-row w-full'>
       <input
-        className='input-box'
+        className='input-box focus:ring-0'
         type='text'
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -148,7 +146,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
       ></input>
 
       <button className='join-leave-button bg-drac_pink' onClick={sendMessage}>
-        send
+        <div className='m-auto'>send</div>
       </button>
     </div>
   )
