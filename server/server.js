@@ -17,6 +17,7 @@ import {
 import { gameTimer } from './gameLogic/timer.js'
 import { chatLogic } from './chat.js'
 import { adminLogic } from './admin.js'
+import { tauntLogic } from './taunt.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -305,6 +306,7 @@ io.on('connection', (socket) => {
 
 chatLogic(io)
 adminLogic(app,io,ADMINPORT,resetRoom)
+tauntLogic(io)
 
 server.listen(PORT, () => {
   console.log(`[SERVER] listening on port ${PORT}`)
