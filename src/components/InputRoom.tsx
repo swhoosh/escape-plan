@@ -18,6 +18,12 @@ const InputRoom = () => {
     })
   }
 
+  const onKeyPress = (event: any) => {
+    if (event.key === 'Enter' && !gameData.playing && !gameData.showBoard) {
+      onJoin()
+    }
+  }
+
   // Join Room
   const onJoin = () => {
     if (roomID.trim().length !== 0) {
@@ -48,37 +54,49 @@ const InputRoom = () => {
   })
 
   return (
-    <div className='flex flex-col w-full mt-2 justify-between'>
+    <div
+      className={`flex w-1/2 m-auto gap-2 
+      ${gameData.roomID ? 'flex-row' : 'flex-col items-center'}`}
+    >
       <input
-        className='appearance-none flex-initial m-auto py-2 pl-4 w-1/2 min-w-[170px] max-w-[200px] rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
+        className={`input-box ${gameData.roomID ? null : 'mt-7'}`}
         type='text'
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder='Enter your name'
       />
+
       <input
-        className='appearance-none flex-initial mt-4 m-auto py-2 pl-4 w-1/2 min-w-[170px] max-w-[200px] rounded-xl focus:ring-2 focus:ring-slate-500 bg-drac_grey text-drac_white leading-tight focus:outline-none'
+        className={`input-box ${gameData.roomID ? null : 'mt-3'}`}
         type='number'
         value={roomID}
         onChange={(e) => setRoomID(e.target.value)}
+        onKeyPress={onKeyPress}
         placeholder='Room Number'
       />
+
       {!gameData.roomID && (
         <button
-          className='flex-initial w-[20%] max-w-[80px] mt-5 m-auto py-2 leading-tight bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40 rounded-full text-center font-bold'
+          className={`join-leave-button  bg-drac_darkgreen
+           shadow-lg shadow-drac_green/40
+           hover:scale-125 hover:rounded-xl transition-all duration-100
+          ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onJoin}
         >
-          join
+          <div className='m-auto'>join</div>
         </button>
       )}
-      {gameData.roomID && !gameData.playing && (
+
+      {gameData.roomID && !gameData.playing ? (
         <button
-          className='flex-initial w-[20%] max-w-[80px] mt-5 m-auto py-2 leading-tight bg-drac_red hover:bg-drac_lightred shadow-lg shadow-drac_red/40 rounded-full text-center font-bold'
+          className={`join-leave-button bg-drac_red 
+          ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onLeave}
         >
-          leave
+          <div className='m-auto'>leave</div>
         </button>
-      )}
+      ) : null}
+
       <div className='mt-3 m-auto text-md'>{roomStatus}</div>
     </div>
   )

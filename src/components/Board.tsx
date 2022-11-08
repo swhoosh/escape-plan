@@ -6,26 +6,24 @@ const Board = () => {
   const { gameData } = useContext(GameContext)
 
   return (
-    <div className='relative justify-center items-center border'>
-      <div className='relative flex flex-col justify-evenly aspect-square text-2xl border'>
-        {gameData.roomData.board.map((row: any, i: number) => {
-          return (
-            <div className='flex flex-row justify-evenly' key={i}>
-              {row.map((tile: any, j: number) => {
-                return (
-                  <Tile
-                    key={j}
-                    tileValue={tile}
-                    i={i}
-                    j={j}
-                    myTurn={gameData.myTurn}
-                  />
-                )
-              })}
-            </div>
-          )
-        })}
-      </div>
+    <div className='relative flex flex-col justify-evenly m-auto max-w-full aspect-square text-2xl border'>
+      {gameData.roomData.board.map((row: any, i: number) => {
+        return (
+          <div className='flex flex-row justify-evenly h-[15%]' key={i}>
+            {row.map((tile: any, j: number) => {
+              return (
+                <Tile
+                  key={j}
+                  tileValue={tile}
+                  i={i}
+                  j={j}
+                  myTurn={gameData.myTurn}
+                />
+              )
+            })}
+          </div>
+        )
+      })}
     </div>
   )
 }

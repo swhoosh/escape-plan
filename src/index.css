@@ -12,9 +12,8 @@
 }
 
 @layer components {
-
   .tile {
-    @apply relative flex aspect-square w-[15%] bg-drac_white text-drac_black rounded-lg shadow-md 
+    @apply relative flex aspect-square bg-drac_white text-drac_black rounded-lg shadow-md 
       enabled:hover:scale-125 transition-all duration-100
   }
 
@@ -27,5 +26,20 @@
     @apply flex grow w-1/3 min-w-[88px] max-w-[172px] h-[50px] m-auto py-2 
     leading-tight bg-drac_darkgreen hover:bg-drac_green 
     shadow-md shadow-drac_green/40 rounded-md text-xl text-center font-bold
+  }
+
+  .input-box {
+    @apply flex grow shrink py-2 px-4 min-w-[50px] w-[80%] max-w-[200px]
+     rounded-xl focus:ring-2 focus:ring-slate-500 
+     bg-drac_grey text-drac_white 
+     leading-tight focus:outline-none appearance-none
+     placeholder-transparent tiny:placeholder-drac_lightgrey
+  }
+
+  .join-leave-button {
+    @apply flex grow w-[40%] max-w-[70px] py-2 leading-tight
+     /* bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40  */
+     rounded-full text-center font-bold 
+     scale-90 hover:scale-100 duration-100
   }
 }
