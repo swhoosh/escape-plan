@@ -145,7 +145,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
         placeholder='chat'
       ></input>
 
-      <button className='join-leave-button bg-drac_pink' onClick={sendMessage}>
+      <button
+        className='join-leave-button rounded-xl bg-drac_pink'
+        onClick={sendMessage}
+      >
         <div className='m-auto'>send</div>
       </button>
     </div>

@@ -72,6 +72,7 @@ const InputRoom = () => {
         <button
           className={`join-leave-button  bg-drac_darkgreen
            shadow-lg shadow-drac_green/40
+           hover:scale-125 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onJoin}
         >
@@ -81,8 +82,8 @@ const InputRoom = () => {
 
       {gameData.roomID && !gameData.playing ? (
         <button
-          className={`join-leave-button bg-drac_red hover:bg-drac_lightred 
-          shadow-lg shadow-drac_red/40
+          className={`join-leave-button bg-drac_red 
+    
           ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onLeave}
         >
