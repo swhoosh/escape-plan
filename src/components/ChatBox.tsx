@@ -91,9 +91,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
   const chatRow = (msg: any, name: any, dateTime: any, key: any) => {
     return (
       <div className='flex flex-row mt-1 text-[2vh]' key={key}>
-        <p>
-          <span className='text-slate-200 pl-1 break-words'>{name} : </span>
-          <span className='text-slate-400 break-words'>{msg}</span>
+        <p className='break-all'>
+          <span className='text-slate-200 pl-1'>{name} : </span>
+          <span className='text-slate-400'>{msg}</span>
         </p>
       </div>
     )
