@@ -5,6 +5,28 @@ import { socketChat } from '../service/socket'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
+  const [showTaunt, setShowTaunt] = useState<string>('')
+
+  useEffect(() => {
+    if (gameData.socket !== undefined) {
+      gameData.socket.on('taunt_display', (id: number) => {
+        const newTaunt =
+          gameData.roomData.warder === id
+            ? 'warder'
+            : gameData.roomData.prisoner === id
+            ? 'prisoner'
+            : ''
+        setShowTaunt(newTaunt)
+        setTimeout(() => {
+          setShowTaunt('')
+        }, 1000)
+      })
+      return () => gameData.socket.off('taunt_display')
+    }
+  }, [gameData.socket])
+  useEffect(() => {
+    console.log('TAUNT', showTaunt)
+  }, [showTaunt])
 
   return (
     <div className='relative flex flex-col justify-evenly m-auto max-w-full aspect-square text-2xl border'>
@@ -19,6 +41,7 @@ const Board = () => {
                   i={i}
                   j={j}
                   myTurn={gameData.myTurn}
+                  showTaunt={showTaunt}
                 />
               )
             })}
@@ -34,15 +57,16 @@ const Tile = ({
   i,
   j,
   myTurn,
+  showTaunt,
 }: {
   tileValue: number
   i: number
   j: number
   myTurn: boolean
+  showTaunt: string
 }) => {
   const { gameData } = useContext(GameContext)
-  const [showTaunt, setShowTaunt] = useState<string>('')
-
+  const [activateTaunt, setActivateTaunt] = useState<boolean>(false)
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
@@ -79,20 +103,14 @@ const Tile = ({
     return true
   }
   useEffect(() => {
-    if (gameData.socket !== undefined) {
-      gameData.socket.on('taunt_display', (id: number) => {
-        const newShowTaunt =
-          gameData.roomData.warder === id
-            ? 'warder'
-            : gameData.roomData.prisoner === id
-            ? 'prisoner'
-            : ''
-        setShowTaunt(newShowTaunt)
-        setTimeout(() => setShowTaunt(''), 2000)
-      })
-      return () => gameData.socket.off('taunt_display')
+    if (showTaunt === 'warder' && tileValue === 3) {
+      setActivateTaunt(true)
+      setTimeout(() => setActivateTaunt(false), 1000)
+    } else if (showTaunt === 'prisoner' && tileValue === 4) {
+      setActivateTaunt(true)
+      setTimeout(() => setActivateTaunt(false), 1000)
     }
-  }, [gameData.socket])
+  }, [showTaunt])
 
   if (tileValue === 1)
     return (
@@ -116,25 +134,35 @@ const Tile = ({
   if (tileValue === 3)
     return (
       <button
-        className={`tile bg-drac_red group ${
-          showTaunt === 'warder' ? 'bg-purple-500' : null
-        }`}
+        className='tile bg-drac_red group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
         {/* {validMove() && <span className='dot'></span>} */}
+        {activateTaunt ? (
+          <img
+            className='absolute -right-20 w-20 h-20 z-50 bg-white'
+            src='/taunt.png'
+            alt=''
+          />
+        ) : null}
       </button>
     )
   if (tileValue === 4)
     return (
       <button
-        className={`tile bg-drac_cyan group ${
-          showTaunt === 'prisoner' ? 'bg-purple-500' : null
-        }`}
+        className='tile bg-drac_cyan group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
         {/* {validMove() && <span className='dot'></span>} */}
+        {activateTaunt ? (
+          <img
+            className='absolute -right-20 w-20 h-20 z-50 bg-white'
+            src='/taunt.png'
+            alt=''
+          />
+        ) : null}
       </button>
     )
   //normal block
