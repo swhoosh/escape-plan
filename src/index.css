@@ -29,7 +29,7 @@
   }
 
   .input-box {
-    @apply flex grow shrink py-2 px-4 min-w-[50px] w-[80%] max-w-[200px]
+    @apply flex grow shrink m-auto py-2 px-4 min-w-[50px] w-[100%] max-w-[200px]
      rounded-xl focus:ring-2 focus:ring-slate-500 
      bg-drac_grey text-drac_white 
      leading-tight focus:outline-none appearance-none

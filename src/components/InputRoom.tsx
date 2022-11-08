@@ -26,12 +26,16 @@ const InputRoom = () => {
 
   // Join Room
   const onJoin = () => {
-    if (roomID.trim().length !== 0) {
+    if (name.trim().length !== 0 && roomID.trim().length !== 0) {
       // room num not empty
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
+      setPlayerName(name)
       gameData.socket.emit('join_room', roomID, name, gameData.socket.id)
-    } else setRoomStatus('ERROR : Enter Room Number')
-    setPlayerName(name)
+    } else {
+      name.trim().length === 0
+        ? setRoomStatus('ERROR : Enter Name')
+        : setRoomStatus('ERROR : Enter Room Number')
+    }
   }
   // Leave Existing Room
   const onLeave = () => {

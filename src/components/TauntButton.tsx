@@ -16,7 +16,7 @@ export default function TauntButton() {
       className='join-leave-button w-[25%] bg-purple-500 rounded-xl'
     >
       <div className='m-auto'>
-        <RiEmotionFill size={25} color='white' />
+        <RiEmotionFill size={20} color='white' />
       </div>
     </button>
   )

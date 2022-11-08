@@ -120,7 +120,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
       {/* chat container */}
       <div
         className='absolute top-0 bottom-0 left-0 right-0 flex flex-col-reverse 
-        mt-3 mb-3 p-3 h-[85%] overflow-y-auto scrollbar-hide
+        mt-3 mb-3 p-3 h-[83%] overflow-y-auto scrollbar-hide
        bg-drac_grey/90 rounded-3xl'
       >
         {chat()}
@@ -156,9 +156,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   }
 
   return (
-    <div className='absolute bottom-3 flex grow flex-row w-full'>
+    <div className='absolute bottom-3 h-[6vh] max-h-[40px] flex grow flex-row w-full'>
       <input
-        className='input-box focus:ring-0'
+        className='input-box focus:ring-0 scale-90'
         type='text'
         value={message}
         onChange={(e) => setMessage(e.target.value)}
