@@ -212,7 +212,7 @@ const App = () => {
             <InputRoom />
           </div>
 
-          <div className='relative grid grid-cols-4 gap-3 justify-around items-center bg-slate-800'>
+          <div className='relative grid grid-cols-4 bg-slate-800'>
             {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}

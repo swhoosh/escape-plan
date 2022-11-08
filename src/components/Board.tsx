@@ -6,7 +6,7 @@ const Board = () => {
   const { gameData } = useContext(GameContext)
 
   return (
-    <div className='relative flex flex-col justify-evenly h-[50vh] aspect-square text-2xl border'>
+    <div className='relative flex flex-col justify-evenly m-auto h-[50vh] aspect-square text-2xl border'>
       {gameData.roomData.board.map((row: any, i: number) => {
         return (
           <div className='flex flex-row justify-evenly h-[15%]' key={i}>
