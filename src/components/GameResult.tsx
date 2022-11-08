@@ -4,7 +4,10 @@ import { GameContext } from '../App'
 
 const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   const { gameData, setGameData } = useContext(GameContext)
-  const [rematchRequest, setRematchRequest] = useState(false)
+  const [ rematchRequest, setRematchRequest ] = useState(false)
+  const [ rematchColA,setRematchColA ] = useState("drac_darkgreen")
+  const [ rematchColB,setRematchColB ] = useState("bg-drac_green")
+  const [ meRequester,setMeRequester ] = useState(false)
 
   if (gameData.showResult) {
     playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
@@ -22,7 +25,9 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
 
   const onReMatch = () => {
     gameData.socket.emit('rematch', gameData.roomID)
-    setRematchRequest(true)
+    // setRematchColA("drac_black")
+    // setRematchColB("drac_darkgrey")
+    setMeRequester(true)
   }
 
   useEffect(()=> {
@@ -66,19 +71,29 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
           })}
         </div>
         <div className='relative flex flex-col'>
+
+          {meRequester ? <p className='text-center w-full p-1'>1/2</p>
+          :
           <button 
-            className='result-button'
+            className={`result-button bg-${rematchColA} hover:${rematchColB} shadow-md ${rematchColA}/40`}
             onClick={onReMatch}
           >
-            Play Again?
-          </button>
-          {rematchRequest&&<p>1/2</p>}
+            <div className='text-center w-full p-1'>
+              Play Again?
+            </div>
+          </button>          
+          }
+
+          {rematchRequest && <span className='text-center w-full p-1'>plz rematch with me.</span>}
+
           <button
             className='result-button max-w-[100px] h-[30px] mt-3
          bg-drac_black shadow-drac_darkgrey/30 hover:bg-drac_darkgrey'
             onClick={onLeave}
           >
-            leave
+            <div className='text-center w-full'>
+              leave
+            </div>
           </button>
         </div>
       </div>
