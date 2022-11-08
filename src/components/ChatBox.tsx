@@ -89,8 +89,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
 
   const chatRow = (msg: any, name: any, dateTime: any, key: any) => {
     return (
-      <div className='text-[2vh] overflow-hidden' key={key}>
-        {name} : {msg}
+      <div className='flex flex-row mt-2 text-[2vh]' key={key}>
+        <p>
+          <span className='text-slate-200 pl-1 break-words'>{name} : </span>
+          <span className='text-slate-400 break-words'>{msg}</span>
+        </p>
       </div>
     )
   }
@@ -108,13 +111,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
   }
 
   return (
-    <div className='relative flex flex-col h-full w-full border'>
+    <div className='relative h-full w-full'>
       {/* <button className='w-1/2 mb-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold' onClick={logChat}>
       log chat
       </button> */}
 
       {/* chat container */}
-      <div className='relative flex flex-col-reverse overflow-hidden h-[90%] border'>
+      <div
+        className='absolute top-0 bottom-0 left-0 right-0 flex flex-col-reverse 
+        mt-3 mb-3 p-3 h-[87%] overflow-y-auto scrollbar-hide
+       bg-drac_grey/90 rounded-3xl'
+      >
         {chat()}
       </div>
 

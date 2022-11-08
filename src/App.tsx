@@ -38,10 +38,10 @@ const App = () => {
   }
 
   useEffect(() => {
-
     gameData.socket.on('connect', () => {
-      setGameData((prevGameData) => ({ //make page refresh on connect
-        ...prevGameData
+      setGameData((prevGameData) => ({
+        //make page refresh on connect
+        ...prevGameData,
       }))
     })
 
@@ -204,13 +204,13 @@ const App = () => {
           <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
         ) : null}
 
-        <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center border'>
+        <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center'>
           <div className=''>
             <div className='text-[5vh] text-center'>Escape Plan</div>
             <InputRoom />
           </div>
 
-          <div className='relative grid grid-cols-4'>
+          <div className='relative grid grid-cols-4 gap-2'>
             {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}

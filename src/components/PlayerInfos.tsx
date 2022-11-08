@@ -18,7 +18,7 @@ const PlayerInfos = ({
   }
 
   return (
-    <div className='relative flex flex-col p-[5%] h-[100%] justify-between border'>
+    <div className='relative flex flex-col p-[5%] h-[100%] justify-between'>
       {playing && <GameTimer />}
       {playerInfos.map((playerInfo: any) => {
         return (
