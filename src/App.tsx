@@ -34,7 +34,7 @@ const App = () => {
     showResult: false,
   })
 
-  const [ noticeText,setNoticeText ] = useState('')
+  const [noticeText, setNoticeText] = useState('')
 
   const onLog = () => {
     console.log(gameData)
@@ -123,7 +123,9 @@ const App = () => {
             showResult: false,
           }))
           setNoticeText('other player left')
-          setTimeout(() => {setNoticeText('')},1500)
+          setTimeout(() => {
+            setNoticeText('')
+          }, 1500)
         }
       }
     )
@@ -221,6 +223,7 @@ const App = () => {
                 playerInfos={gameData.playerInfos}
                 role={gameData.role}
                 playing={gameData.playing}
+                myTurn={gameData.myTurn}
               />
             ) : null}
 
@@ -246,7 +249,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      { noticeText !== '' &&  <BigNotice text={`${noticeText}`}></BigNotice>}
+      {noticeText !== '' && <BigNotice text={`${noticeText}`}></BigNotice>}
     </GameContext.Provider>
   )
 }

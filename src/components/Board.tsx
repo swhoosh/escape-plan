@@ -71,7 +71,7 @@ const Tile = ({
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
         gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
-        console.log('LETS GOOOO')
+        // console.log('LETS GOOOO')
         gameData.myTurn = false
       }
     }

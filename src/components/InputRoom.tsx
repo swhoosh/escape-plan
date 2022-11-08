@@ -62,22 +62,26 @@ const InputRoom = () => {
       className={`flex w-1/2 m-auto gap-2 
       ${gameData.roomID ? 'flex-row' : 'flex-col items-center'}`}
     >
-      <input
-        className={`input-box ${gameData.roomID ? null : 'mt-7'}`}
-        type='text'
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder='Enter your name'
-      />
+      {!gameData.playing ? (
+        <input
+          className={`input-box ${gameData.roomID ? null : 'mt-7'}`}
+          type='text'
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder='Enter your name'
+        />
+      ) : null}
 
-      <input
-        className={`input-box ${gameData.roomID ? null : 'mt-3'}`}
-        type='number'
-        value={roomID}
-        onChange={(e) => setRoomID(e.target.value)}
-        onKeyPress={onKeyPress}
-        placeholder='Room Number'
-      />
+      {!gameData.playing ? (
+        <input
+          className={`input-box ${gameData.roomID ? null : 'mt-3'}`}
+          type='number'
+          value={roomID}
+          onChange={(e) => setRoomID(e.target.value)}
+          onKeyPress={onKeyPress}
+          placeholder='Room Number'
+        />
+      ) : null}
 
       {!gameData.roomID && (
         <button
