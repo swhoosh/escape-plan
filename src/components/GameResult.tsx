@@ -1,9 +1,10 @@
 import { RiVipCrownFill } from 'react-icons/ri'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { GameContext } from '../App'
 
 const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   const { gameData, setGameData } = useContext(GameContext)
+  const [rematchRequest, setRematchRequest] = useState(false)
 
   if (gameData.showResult) {
     playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
@@ -18,6 +19,22 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
     setGameData({ ...gameData, roomID: '' })
     gameData.socket.emit('leave_room', gameData.roomID)
   }
+
+  const onReMatch = () => {
+    gameData.socket.emit('rematch', gameData.roomID)
+    setRematchRequest(true)
+  }
+
+  useEffect(()=> {
+    gameData.socket.on('rematch request', ()=>{
+      setRematchRequest(true)
+    })
+    return () =>{
+      gameData.socket.off('rematch request')
+    }
+  },[])
+
+
 
   if (gameData.showResult)
     return (
@@ -49,7 +66,13 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
           })}
         </div>
         <div className='relative flex flex-col'>
-          <button className='result-button'>Play Again?</button>
+          <button 
+            className='result-button'
+            onClick={onReMatch}
+          >
+            Play Again?
+          </button>
+          {rematchRequest&&<p>1/2</p>}
           <button
             className='result-button max-w-[100px] h-[30px] mt-3
          bg-drac_black shadow-drac_darkgrey/30 hover:bg-drac_darkgrey'
