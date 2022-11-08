@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { GameContext } from '../App'
 import { socketChat } from '../service/socket'
+import TauntButton from './TauntButton'
 
 type ChatBoxProps = {
   chatScope: string
@@ -163,6 +164,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
       >
         <div className='m-auto'>send</div>
       </button>
+      <TauntButton />
     </div>
   )
 }

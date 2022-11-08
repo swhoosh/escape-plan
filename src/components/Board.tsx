@@ -1,6 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
+import { socketChat } from '../service/socket'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
@@ -40,6 +41,7 @@ const Tile = ({
   myTurn: boolean
 }) => {
   const { gameData } = useContext(GameContext)
+  const [showTaunt, setShowTaunt] = useState<string>('')
 
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
@@ -76,6 +78,21 @@ const Tile = ({
     }
     return true
   }
+  useEffect(() => {
+    if (gameData.socket !== undefined) {
+      gameData.socket.on('taunt_display', (id: number) => {
+        const newShowTaunt =
+          gameData.roomData.warder === id
+            ? 'warder'
+            : gameData.roomData.prisoner === id
+            ? 'prisoner'
+            : ''
+        setShowTaunt(newShowTaunt)
+        setTimeout(() => setShowTaunt(''), 2000)
+      })
+      return () => gameData.socket.off('taunt_display')
+    }
+  }, [gameData.socket])
 
   if (tileValue === 1)
     return (
@@ -99,7 +116,9 @@ const Tile = ({
   if (tileValue === 3)
     return (
       <button
-        className='tile bg-drac_red group'
+        className={`tile bg-drac_red group ${
+          showTaunt === 'warder' ? 'bg-purple-500' : null
+        }`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -109,7 +128,9 @@ const Tile = ({
   if (tileValue === 4)
     return (
       <button
-        className='tile bg-drac_cyan group'
+        className={`tile bg-drac_cyan group ${
+          showTaunt === 'prisoner' ? 'bg-purple-500' : null
+        }`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
