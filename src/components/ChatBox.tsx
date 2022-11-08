@@ -88,20 +88,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
 
   const chatRow = (msg: any, name: any, dateTime: any, key: any) => {
     return (
-      <p key={key}>
-        {name} at {chatTime(dateTime)} : {msg}
-      </p>
+      <div className='text-[2vh] overflow-hidden' key={key}>
+        {name} : {msg}
+      </div>
     )
   }
 
   const chat = () => {
-    var i = 0
+    var i = chatData.message.length - 1
     var chatBuffer = []
-    while (i < chatData.message.length) {
+    while (i >= 0) {
       chatBuffer.push(
         chatRow(chatData.message[i], chatData.name[i], chatData.dateTime[i], i)
       )
-      i++
+      i--
     }
     return chatBuffer
   }
@@ -111,7 +111,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
       {/* <button className='w-1/2 mb-5 m-auto py-1 rounded-full leading-tight bg-drac_red hover:bg-drac_lightred font-bold' onClick={logChat}>
       log chat
       </button> */}
-      {chat()}
+
+      {/* chat container */}
+      <div className='relative flex flex-col-reverse overflow-hidden h-[90%] border'>
+        {chat()}
+      </div>
+
       <ChatInput chatScope={chatScope} />
     </div>
   )
@@ -128,6 +133,12 @@ type ChatInputProps = {
 const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   const [message, setMessage] = useState('')
 
+  const onKeyPress = (event: any) => {
+    if (event.key === 'Enter') {
+      sendMessage()
+    }
+  }
+
   const sendMessage = () => {
     if (message !== '') {
       socketChat.emit('send message', message, chatScope)
@@ -142,6 +153,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
         type='text'
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={onKeyPress}
         placeholder='chat'
       ></input>
 

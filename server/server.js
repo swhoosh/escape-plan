@@ -28,6 +28,7 @@ const io = new Server(server, {
 // where we store our data
 const all_rooms = {}
 var timerIntervalId = []
+var clientCounter = 0
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')

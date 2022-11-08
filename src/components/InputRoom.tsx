@@ -18,6 +18,12 @@ const InputRoom = () => {
     })
   }
 
+  const onKeyPress = (event: any) => {
+    if (event.key === 'Enter' && !gameData.playing && !gameData.showBoard) {
+      onJoin()
+    }
+  }
+
   // Join Room
   const onJoin = () => {
     if (roomID.trim().length !== 0) {
@@ -65,6 +71,7 @@ const InputRoom = () => {
         type='number'
         value={roomID}
         onChange={(e) => setRoomID(e.target.value)}
+        onKeyPress={onKeyPress}
         placeholder='Room Number'
       />
 
@@ -83,7 +90,6 @@ const InputRoom = () => {
       {gameData.roomID && !gameData.playing ? (
         <button
           className={`join-leave-button bg-drac_red 
-    
           ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onLeave}
         >
