@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react'
 import { GameContext } from '../App'
+import OptionsButton from './OptionsButton'
 
 const InputRoom = () => {
   const { gameData, setGameData } = useContext(GameContext)
@@ -30,7 +31,7 @@ const InputRoom = () => {
       // room num not empty
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
       setPlayerName(name)
-      gameData.socket.emit('join_room', roomID, name, gameData.socket.id)
+      gameData.socket.emit('join_room', roomID, name, gameData.options)
     } else {
       name.trim().length === 0
         ? setRoomStatus('ERROR : Enter Name')
@@ -84,15 +85,18 @@ const InputRoom = () => {
       ) : null}
 
       {!gameData.roomID && (
-        <button
-          className={`join-leave-button  bg-drac_darkgreen
+        <>
+          <button
+            className={`join-leave-button  bg-drac_darkgreen
            shadow-lg shadow-drac_green/40
            hover:scale-125 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={onJoin}
-        >
-          <div className='m-auto'>join</div>
-        </button>
+            onClick={onJoin}
+          >
+            <div className='m-auto'>join</div>
+          </button>
+          <OptionsButton />
+        </>
       )}
 
       {gameData.roomID && !gameData.playing ? (

@@ -2,11 +2,12 @@ export const gameTimer = (
   io,
   room_id,
   timer_interval,
-  turn_time = 10,
-  skipturn
+  skipturn,
+  options,
 ) => {
   //default 10 + 1 second turn timer. give +1 second
   //clear interval of prev turn
+  let turn_time = options.speedMode ? 3 : 10
   if (typeof timer_interval !== 'undefined') clearInterval(timer_interval)
   //start interval
   io.to(room_id).emit('timer', turn_time)

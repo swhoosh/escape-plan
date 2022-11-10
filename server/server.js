@@ -88,6 +88,7 @@ const generate_new_roomData = (roomID) => {
     warder_pos: w_pos,
     prisoner_pos: p_pos,
     turn: 'warder',
+    options: all_rooms[roomID]['storeOptions'],
   }
   all_rooms[roomID]['roomData'] = roomData
   return roomData
@@ -104,8 +105,8 @@ const skipTurn = (roomID) => {
     io,
     roomID,
     timerIntervalId[roomID],
-    10,
-    skipTurn
+    skipTurn,
+    roomData.options
   )
 }
 
@@ -139,8 +140,8 @@ const startRoom = (roomID) => {
     io,
     roomID,
     timerIntervalId[roomID],
-    10,
-    skipTurn
+    skipTurn,
+    roomData.options
   )
 }
 
@@ -177,7 +178,7 @@ io.on('connection', (socket) => {
   // console.log(`socket connected ${io.of("/").sockets.size}`)
 
   // ON JOIN ROOM
-  socket.on('join_room', async (roomID, playerName) => {
+  socket.on('join_room', async (roomID, playerName, options) => {
     if (n_sockets_in_room(roomID) >= 2) {
       socket.emit('room_full')
       return
@@ -196,9 +197,12 @@ io.on('connection', (socket) => {
     }
 
     // create room when no room, if already has a player in room push new player
-    !(roomID in all_rooms)
-      ? (all_rooms[roomID] = { playerInfos: [newPlayerInfo] })
-      : all_rooms[roomID]['playerInfos'].push(newPlayerInfo)
+    if (!(roomID in all_rooms)) {
+      all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
+      all_rooms[roomID]['storeOptions'] = options
+    } else {
+      all_rooms[roomID]['playerInfos'].push(newPlayerInfo)
+    }
 
     // generate empty board just to show
     let roomData = { board: generateEmptyBoard() }
@@ -216,10 +220,10 @@ io.on('connection', (socket) => {
 
       timerIntervalId[roomID] = gameTimer(
         io,
-        roomID,
-        timerIntervalId[roomID],
-        10,
-        skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
       )
     }
     // only 1 player game not started
@@ -265,10 +269,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-          roomID,
-          timerIntervalId[roomID],
-          10,
-          skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'prisoner'
@@ -289,10 +293,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-          roomID,
-          timerIntervalId[roomID],
-          10,
-          skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'warder'
