@@ -73,7 +73,7 @@ const update_player_infos = async (roomID, socketID) => {
   if (n_sockets_in_room(roomID) === 0) delete all_rooms[roomID]
 }
 
-const generate_new_roomData = (roomID,options) => {
+const generate_new_roomData = (roomID) => {
   const board = generateBoard() // generate empty board with obstacles
   const playerIndex = getRandomInt(1) // select player to be warder
   const w_pos = generateEntityPos(board) // get random pos {x, y}
@@ -88,7 +88,7 @@ const generate_new_roomData = (roomID,options) => {
     warder_pos: w_pos,
     prisoner_pos: p_pos,
     turn: 'warder',
-    options: options,
+    options: all_rooms[roomID]['storeOptions'],
   }
   all_rooms[roomID]['roomData'] = roomData
   return roomData
@@ -127,8 +127,8 @@ const handle_leave_room = (roomID, socketID) => {
   print_rooms()
 }
 
-const startRoom = (roomID,options) => {
-  let roomData = generate_new_roomData(roomID,options)
+const startRoom = (roomID) => {
+  let roomData = generate_new_roomData(roomID)
 
   io.to(roomID).emit(
     'game_start',
@@ -179,7 +179,6 @@ io.on('connection', (socket) => {
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName, options) => {
-    console.log("[OPTIONS]",options)
     if (n_sockets_in_room(roomID) >= 2) {
       socket.emit('room_full')
       return
@@ -211,7 +210,7 @@ io.on('connection', (socket) => {
 
     // 2 players in room already
     if (n_sockets_in_room(roomID) === 2) {
-      roomData = generate_new_roomData(roomID,all_rooms[roomID]['storeOptions'])
+      roomData = generate_new_roomData(roomID)
 
       io.to(roomID).emit(
         'game_start',
