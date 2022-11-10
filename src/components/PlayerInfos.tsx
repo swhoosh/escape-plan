@@ -24,11 +24,11 @@ const PlayerInfos = ({
       {/* slide pane */}
       {playing ? (
         <div
-          className={`absolute w-full h-[60%] bg-slate-50/10 
+          className={`absolute w-full h-[50%] bg-slate-50/10 
         ${
-          myTurn ? 'translate-y-[0]' : 'translate-y-[60%]'
+          myTurn ? 'translate-y-[0]' : 'translate-y-full'
         } transition-all duration-300`}
-        ></div>
+        />
       ) : null}
 
       {/* playerInfos container */}

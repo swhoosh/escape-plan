@@ -8,6 +8,8 @@ export interface OptionsInterface {
 
 const options: OptionsInterface = {
   speedMode: false,
+  grid10: false,
+  grid20: false,
 }
 
 const OptionsButton = () => {
@@ -25,20 +27,20 @@ const OptionsButton = () => {
 
   return (
     <>
-      {Object.keys(options).map((optionValue) => {
-        return (
-          <>
-            <button
-              onClick={handleOnClick}
-              className={`join-leave-button max-w-[80px] text-white rounded-xl ${
-                visible ? 'bg-drac_lightgrey/60' : 'bg-drac_grey'
-              }`}
-            >
-              <div className='m-auto text-sm'>options</div>
-            </button>
+      <button
+        onClick={handleOnClick}
+        className={`join-leave-button max-w-[80px] text-white rounded-xl ${
+          visible ? 'bg-drac_lightgrey/60' : 'bg-drac_grey'
+        }`}
+      >
+        <div className='m-auto text-sm'>options</div>
+      </button>
 
-            {visible ? (
-              <div className='bg-drac_grey p-1 rounded-lg'>
+      {visible ? (
+        <div className='flex gap-1 bg-drac_grey p-1 rounded-lg'>
+          {Object.keys(options).map((optionValue: any) => {
+            return (
+              <>
                 <Option
                   label={optionValue}
                   stateChangeCallback={(selected: boolean) => {
@@ -47,11 +49,11 @@ const OptionsButton = () => {
                     setOptionsState(newOptions)
                   }}
                 />
-              </div>
-            ) : null}
-          </>
-        )
-      })}
+              </>
+            )
+          })}
+        </div>
+      ) : null}
     </>
   )
 }

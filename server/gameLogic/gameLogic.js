@@ -1,4 +1,4 @@
-const grid_size = 5
+const grid_size = 6 // 5 6 8 10
 const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
 
 /* tile info

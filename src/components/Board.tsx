@@ -28,10 +28,12 @@ const Board = () => {
   }, [showTaunt])
 
   return (
-    <div className='relative flex flex-col justify-evenly m-auto max-w-[90%] aspect-square text-2xl'>
+    // rows
+    <div className='relative flex flex-col justify-between m-auto aspect-square text-2xl'>
       {gameData.roomData.board.map((row: any, i: number) => {
         return (
-          <div className='flex flex-row justify-evenly h-[15%]' key={i}>
+          // element in row
+          <div className='relative flex gap-5 justify-between' key={i}>
             {row.map((tile: any, j: number) => {
               return (
                 <Tile

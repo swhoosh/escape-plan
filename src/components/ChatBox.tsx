@@ -120,7 +120,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
       {/* chat container */}
       <div
         className='absolute top-0 bottom-0 left-0 right-0 flex flex-col-reverse 
-        mt-3 mb-3 p-3 h-[83%] overflow-y-auto scrollbar-hide
+        h-[90%] p-3 overflow-y-auto scrollbar-hide
         bg-slate-50/10 rounded-3xl'
       >
         {chat()}
@@ -139,6 +139,7 @@ ChatBox.defaultProps = {
 type ChatInputProps = {
   chatScope: string
 }
+
 const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   const [message, setMessage] = useState('')
 
@@ -156,9 +157,9 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   }
 
   return (
-    <div className='absolute bottom-3 h-[6vh] max-h-[40px] flex grow flex-row w-full'>
+    <div className='absolute bottom-0 flex flex-row max-h-[35px] w-full'>
       <input
-        className='input-box focus:ring-0 scale-90'
+        className='input-box w-[70%] max-w-[70%] h-full focus:ring-0'
         type='text'
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -167,7 +168,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
       ></input>
 
       <button
-        className='join-leave-button w-[25%] rounded-xl bg-drac_pink'
+        className='chat-button max-w-[60px] rounded-xl bg-drac_pink'
         onClick={sendMessage}
       >
         <div className='m-auto text-[2vh]'>send</div>

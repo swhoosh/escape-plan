@@ -11,11 +11,8 @@ export default function TauntButton() {
     }
   }
   return (
-    <button
-      onClick={handleOnClick}
-      className='join-leave-button w-[25%] bg-purple-500 rounded-xl'
-    >
-      <div className='m-auto'>
+    <button onClick={handleOnClick} className='chat-button max-w-[40px]'>
+      <div className='w-[20px] m-auto'>
         <RiEmotionFill size={20} color='white' />
       </div>
     </button>

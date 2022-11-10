@@ -213,7 +213,7 @@ const App = () => {
         ) : null}
 
         {/* Main container */}
-        <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center'>
+        <div className='relative flex grow flex-col max-w-[1024px] justify-center'>
           {/* Game title + inputRoom */}
           <>
             <div className='text-[5vh] text-center'>Escape Plan</div>
@@ -221,7 +221,7 @@ const App = () => {
           </>
 
           {/* Game */}
-          <div className='relative grid grid-cols-4 gap-2'>
+          <div className='relative grid grid-cols-4 gap-[2%]'>
             {/* PlayerInfos */}
             {gameData.showPlayerInfos ? (
               <PlayerInfos

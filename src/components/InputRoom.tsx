@@ -19,7 +19,8 @@ const InputRoom = () => {
     })
   }
 
-  const onKeyPress = (event: any) => {
+  // check enter
+  const handleKeyPress = (event: any) => {
     if (event.key === 'Enter' && !gameData.playing && !gameData.showBoard) {
       onJoin()
     }
@@ -60,7 +61,7 @@ const InputRoom = () => {
 
   return (
     <div
-      className={`flex w-1/2 m-auto gap-2 
+      className={`flex w-1/2 mb-[2%] m-auto gap-2  
       ${gameData.roomID ? 'flex-row' : 'flex-col items-center'}`}
     >
       {!gameData.playing ? (
@@ -69,6 +70,7 @@ const InputRoom = () => {
           type='text'
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder='Enter your name'
         />
       ) : null}
@@ -79,7 +81,7 @@ const InputRoom = () => {
           type='number'
           value={roomID}
           onChange={(e) => setRoomID(e.target.value)}
-          onKeyPress={onKeyPress}
+          onKeyPress={handleKeyPress}
           placeholder='Room Number'
         />
       ) : null}
