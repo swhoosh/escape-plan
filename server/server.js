@@ -105,8 +105,8 @@ const skipTurn = (roomID) => {
     io,
     roomID,
     timerIntervalId[roomID],
-    10,
-    skipTurn
+    skipTurn,
+    roomData.options
   )
 }
 
@@ -140,8 +140,8 @@ const startRoom = (roomID,options) => {
     io,
     roomID,
     timerIntervalId[roomID],
-    10,
-    skipTurn
+    skipTurn,
+    roomData.options
   )
 }
 
@@ -221,10 +221,10 @@ io.on('connection', (socket) => {
 
       timerIntervalId[roomID] = gameTimer(
         io,
-        roomID,
-        timerIntervalId[roomID],
-        10,
-        skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
       )
     }
     // only 1 player game not started
@@ -270,10 +270,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-          roomID,
-          timerIntervalId[roomID],
-          10,
-          skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'prisoner'
@@ -294,10 +294,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-          roomID,
-          timerIntervalId[roomID],
-          10,
-          skipTurn
+    roomID,
+    timerIntervalId[roomID],
+    skipTurn,
+    roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'warder'
