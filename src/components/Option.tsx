@@ -22,8 +22,8 @@ export const Option = ({
   return (
     <button
       onClick={handleOnClick}
-      className={`p-5 text-white rounded-lg transition duration-200 ${
-        selected ? 'bg-red-500' : 'bg-slate-500'
+      className={`p-2 text-xs text-white rounded-lg transition duration-200 ${
+        selected ? 'bg-blue-400' : 'bg-slate-500'
       }`}
     >
       {label}

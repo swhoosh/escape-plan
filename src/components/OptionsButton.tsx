@@ -28,14 +28,15 @@ const OptionsButton = () => {
       {Object.keys(options).map((optionValue) => {
         return (
           <>
-            <div
+            <button
               onClick={handleOnClick}
-              className='join-leave-button bg-blue-400 text-white rounded-xl'
+              className='join-leave-button max-w-[80px] bg-blue-400 text-white rounded-xl'
             >
-              Options
-            </div>
+              <div className='m-auto'>Options</div>
+            </button>
+
             {visible ? (
-              <div className='bg-red-300 rounded-lg p-3'>
+              <div className='bg-red-300 rounded-lg'>
                 <Option
                   label={optionValue}
                   stateChangeCallback={(selected: boolean) => {

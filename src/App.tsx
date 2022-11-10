@@ -207,17 +207,22 @@ const App = () => {
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
+        {/* Result Screen */}
         {gameData.showResult ? (
           <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
         ) : null}
 
+        {/* Main container */}
         <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center'>
-          <div className=''>
+          {/* Game title + inputRoom */}
+          <>
             <div className='text-[5vh] text-center'>Escape Plan</div>
             <InputRoom />
-          </div>
+          </>
 
+          {/* Game */}
           <div className='relative grid grid-cols-4 gap-2'>
+            {/* PlayerInfos */}
             {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}
@@ -227,18 +232,19 @@ const App = () => {
               />
             ) : null}
 
+            {/* Board */}
             <div className='col-span-2'>
               {gameData.showBoard ? <Board /> : null}
-              {/* {gameData.playing && <GameTimer />} */}
-              {/* {gameData.playing ? <GameTurn /> : null} */}
             </div>
 
+            {/* Chat */}
             {gameData.showBoard ? (
               <ChatBox chatScope={gameData.roomID} />
             ) : null}
           </div>
         </div>
 
+        {/* footer */}
         <div className='fixed flex flex-col bottom-0'>
           <button
             className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
