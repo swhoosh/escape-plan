@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+
 interface OptionPropsInterface {
   stateChangeCallback: Function
   label: string
@@ -9,12 +10,15 @@ export const Option = ({
   label,
 }: OptionPropsInterface) => {
   const [selected, setSelected] = useState<boolean>(false)
+
   const handleOnClick = () => {
     setSelected(!selected)
   }
+
   useEffect(() => {
     stateChangeCallback(selected)
   }, [selected])
+
   return (
     <button
       onClick={handleOnClick}
