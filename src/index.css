@@ -37,9 +37,9 @@
   }
 
   .join-leave-button {
-    @apply flex grow w-[40%] max-w-[70px] py-2 leading-tight
+    @apply flex grow w-[40%] max-w-[100px] py-2 leading-tight
      /* bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40  */
-     rounded-full text-center font-bold
+     rounded-full text-center text-xl
      scale-90 hover:scale-100 duration-100
   }
 }

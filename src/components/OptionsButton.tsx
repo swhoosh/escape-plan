@@ -30,13 +30,15 @@ const OptionsButton = () => {
           <>
             <button
               onClick={handleOnClick}
-              className='join-leave-button max-w-[80px] bg-blue-400 text-white rounded-xl'
+              className={`join-leave-button max-w-[80px] text-white rounded-xl ${
+                visible ? 'bg-drac_lightgrey/60' : 'bg-drac_grey'
+              }`}
             >
-              <div className='m-auto'>Options</div>
+              <div className='m-auto text-sm'>options</div>
             </button>
 
             {visible ? (
-              <div className='bg-red-300 rounded-lg'>
+              <div className='bg-drac_grey p-1 rounded-lg'>
                 <Option
                   label={optionValue}
                   stateChangeCallback={(selected: boolean) => {
