@@ -233,7 +233,9 @@ const App = () => {
               {/* {gameData.playing ? <GameTurn /> : null} */}
             </div>
 
-            {gameData.showBoard ? <ChatBox chatScope='global' /> : null}
+            {gameData.showBoard ? (
+              <ChatBox chatScope={gameData.roomID} />
+            ) : null}
           </div>
         </div>
 
