@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { GameContext } from '../App'
 import { Option } from './Option'
 
-interface OptionsInterface {
+export interface OptionsInterface {
   [key: string]: any
 }
 
@@ -10,6 +11,7 @@ const options: OptionsInterface = {
 }
 
 const OptionsButton = () => {
+  const { gameData, setGameData } = useContext(GameContext)
   const [visible, setVisible] = useState<boolean>(false)
   const [optionsState, setOptionsState] = useState<OptionsInterface>(options)
 
@@ -18,7 +20,7 @@ const OptionsButton = () => {
   }
 
   useEffect(() => {
-    console.log(optionsState)
+    setGameData({ ...gameData, options: optionsState })
   }, [optionsState])
 
   return (

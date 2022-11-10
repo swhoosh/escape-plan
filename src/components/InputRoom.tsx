@@ -31,7 +31,7 @@ const InputRoom = () => {
       // room num not empty
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
       setPlayerName(name)
-      gameData.socket.emit('join_room', roomID, name, gameData.socket.id)
+      gameData.socket.emit('join_room', roomID, name, gameData.options)
     } else {
       name.trim().length === 0
         ? setRoomStatus('ERROR : Enter Name')
