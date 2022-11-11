@@ -1,11 +1,17 @@
 import { useState, useContext } from 'react'
 import { GameContext } from '../App'
+import popOnAudio from '../sounds/bubble.mp3'
 
 const InputRoom = () => {
   const { gameData, setGameData } = useContext(GameContext)
   const [name, setName] = useState('')
   const [roomID, setRoomID] = useState('')
   const [roomStatus, setRoomStatus] = useState('')
+
+  const playPopOn = () => {
+    const popOn = new Audio(popOnAudio)
+    popOn.play()
+  }
 
   // Set Name
   const setPlayerName = (name: string) => {
@@ -90,6 +96,7 @@ const InputRoom = () => {
            hover:scale-125 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
           onClick={onJoin}
+          onMouseEnter={playPopOn}
         >
           <div className='m-auto'>join</div>
         </button>
