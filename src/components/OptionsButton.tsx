@@ -7,9 +7,11 @@ export interface OptionsInterface {
 }
 
 const options: OptionsInterface = {
-  speedMode: false,
+  grid5: false,
+  grid6: false,
+  grid8: false,
   grid10: false,
-  grid20: false,
+  speedMode: false,
 }
 
 const OptionsButton = () => {
@@ -44,7 +46,7 @@ const OptionsButton = () => {
                 <Option
                   label={optionValue}
                   stateChangeCallback={(selected: boolean) => {
-                    const newOptions = { ...options }
+                    const newOptions = { ...optionsState }
                     newOptions[optionValue] = selected
                     setOptionsState(newOptions)
                   }}

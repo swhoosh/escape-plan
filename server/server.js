@@ -5,7 +5,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import path from 'path'
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url'
 
 import {
   generateBoard,
@@ -26,21 +26,20 @@ const ADMINPORT = 8000
 const io = new Server(server, {
   cors: {
     origin: '*', // front-end
-  }, 
+  },
 })
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+app.use(express.static(path.join(__dirname, 'public')))
 //body parser
-app.use(express.json());
+app.use(express.json())
 
 // where we store our data
 const all_rooms = {}
 var timerIntervalId = []
-var clientCounter = 0
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
@@ -130,11 +129,7 @@ const handle_leave_room = (roomID, socketID) => {
 const startRoom = (roomID) => {
   let roomData = generate_new_roomData(roomID)
 
-  io.to(roomID).emit(
-    'game_start',
-    roomData,
-    all_rooms[roomID]['playerInfos']
-  )
+  io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
 
   timerIntervalId[roomID] = gameTimer(
     io,
@@ -146,7 +141,8 @@ const startRoom = (roomID) => {
 }
 
 const resetScore = (roomID) => {
-  for(const [key] of Object.entries(all_rooms[roomID]['playerInfos'])) all_rooms[roomID]['playerInfos'][key]['score'] = 0
+  for (const [key] of Object.entries(all_rooms[roomID]['playerInfos']))
+    all_rooms[roomID]['playerInfos'][key]['score'] = 0
 }
 
 const resetRoom = (roomID) => {
@@ -161,20 +157,16 @@ const reMatch = (roomID) => {
   if (!(roomID in all_rooms)) return
   if (n_sockets_in_room(roomID) !== 2) return
   startRoom(roomID)
-  io.to(roomID).emit(
-    'update_showResult',
-    false
-  )
+  io.to(roomID).emit('update_showResult', false)
   return
 }
-
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
   // console.log(`${socket.id} : ${io.engine.clientsCount - 1}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
-  io.of('/admin').emit('update player count', io.of("/").sockets.size)
+  io.of('/admin').emit('update player count', io.of('/').sockets.size)
   // console.log(`socket connected ${io.of("/").sockets.size}`)
 
   // ON JOIN ROOM
@@ -193,13 +185,13 @@ io.on('connection', (socket) => {
       socketID: socket.id,
       score: 0,
       priority: 0,
-      reMatch: false
+      reMatch: false,
     }
 
     // create room when no room, if already has a player in room push new player
     if (!(roomID in all_rooms)) {
       all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
-      all_rooms[roomID]['storeOptions'] = options
+      all_rooms[roomID]['gameOptions'] = options
     } else {
       all_rooms[roomID]['playerInfos'].push(newPlayerInfo)
     }
@@ -220,13 +212,13 @@ io.on('connection', (socket) => {
 
       timerIntervalId[roomID] = gameTimer(
         io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+        roomID,
+        timerIntervalId[roomID],
+        skipTurn,
+        roomData.options
       )
     }
-    // only 1 player game not started
+    // only 1 player, game does not start
     else {
       io.to(roomID).emit(
         'update_playerInfo',
@@ -269,10 +261,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+          roomID,
+          timerIntervalId[roomID],
+          skipTurn,
+          roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'prisoner'
@@ -293,10 +285,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+          roomID,
+          timerIntervalId[roomID],
+          skipTurn,
+          roomData.options
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'warder'
@@ -309,24 +301,32 @@ io.on('connection', (socket) => {
 
   socket.on('rematch', (roomID) => {
     //set want to rematch
-    all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => {
-      if(playerInfo['socketID'] === socket.id) return {
-        ...playerInfo,
-        reMatch : true
-      }; 
-      else return playerInfo
-    })
+    all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+      (playerInfo) => {
+        if (playerInfo['socketID'] === socket.id)
+          return {
+            ...playerInfo,
+            reMatch: true,
+          }
+        else return playerInfo
+      }
+    )
 
     socket.to(roomID).emit('rematch request')
 
-    if(all_rooms[roomID]['playerInfos'][0]['reMatch'] + all_rooms[roomID]['playerInfos'][1]['reMatch'] == 2) {
+    if (
+      all_rooms[roomID]['playerInfos'][0]['reMatch'] +
+        all_rooms[roomID]['playerInfos'][1]['reMatch'] ==
+      2
+    ) {
       reMatch(roomID)
-      all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => ({
+      all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+        (playerInfo) => ({
           ...playerInfo,
-          reMatch : false
-      }))
+          reMatch: false,
+        })
+      )
     }
-
   })
 
   // on client refresh / close
@@ -335,7 +335,7 @@ io.on('connection', (socket) => {
     socket.rooms.forEach((roomID) => {
       handle_leave_room(roomID, socket.id)
     })
-    io.of('/admin').emit('update player count', io.of("/").sockets.size - 1)
+    io.of('/admin').emit('update player count', io.of('/').sockets.size - 1)
     // console.log(`socket disconnected ${io.of("/").sockets.size - 1}`)
   })
 
@@ -343,7 +343,7 @@ io.on('connection', (socket) => {
 })
 
 chatLogic(io)
-adminLogic(app,io,ADMINPORT,resetRoom)
+adminLogic(app, io, ADMINPORT, resetRoom)
 tauntLogic(io)
 
 server.listen(PORT, () => {
