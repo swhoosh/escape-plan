@@ -1,5 +1,5 @@
-const grid_size = 6 // 5 6 8 10
-const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
+// var grid_size = 5 // 5 6 8 10
+// var max_obstacle = Math.floor(0.2 * grid_size * grid_size)
 
 /* tile info
     0 : normal 
@@ -8,18 +8,25 @@ const max_obstacle = Math.floor(0.2 * grid_size * grid_size)
     3 : warder
     4 : prisoner
 */
-export const generateBoard = () => {
+
+// export const setGridSize = (x) => {
+//   grid_size = x
+//   max_obstacle = Math.floor(0.2 * grid_size * grid_size)
+// }
+
+export const generateBoard = (grid_size) => {
   let board = createArray(grid_size)
-  board = generateObstacle(board)
-  board = generateTiles(board, 2) // generate tunnel
+  board = generateObstacle(board, grid_size)
+  board = generateTiles(board, 2, grid_size) // generate tunnel
   return board
 }
 
-export const generateEmptyBoard = () => {
+export const generateEmptyBoard = (grid_size) => {
   return createArray(grid_size)
 }
 
-const generateObstacle = (board) => {
+const generateObstacle = (board, grid_size) => {
+  let max_obstacle = Math.floor(0.2 * grid_size * grid_size)
   let n = 0
   while (n < max_obstacle) {
     let x = getRandomInt(grid_size - 1)
@@ -32,7 +39,7 @@ const generateObstacle = (board) => {
   return board
 }
 
-const generateTiles = (board, tiles_type) => {
+const generateTiles = (board, tiles_type, grid_size) => {
   while (true) {
     let x = getRandomInt(grid_size - 1)
     let y = getRandomInt(grid_size - 1)
@@ -43,7 +50,7 @@ const generateTiles = (board, tiles_type) => {
   }
 }
 
-export const generateEntityPos = (board) => {
+export const generateEntityPos = (board, grid_size) => {
   while (true) {
     let x = getRandomInt(grid_size - 1)
     let y = getRandomInt(grid_size - 1)
@@ -53,10 +60,10 @@ export const generateEntityPos = (board) => {
   }
 }
 
-export const createArray = (size) => {
-  let arr = new Array(size)
+export const createArray = (grid_size) => {
+  let arr = new Array(grid_size)
   for (let i = 0; i < arr.length; i++) {
-    arr[i] = new Array(size).fill(0)
+    arr[i] = new Array(grid_size).fill(0)
   }
   return arr
 }

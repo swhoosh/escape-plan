@@ -5,7 +5,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import path from 'path'
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url'
 
 import {
   generateBoard,
@@ -26,21 +26,20 @@ const ADMINPORT = 8000
 const io = new Server(server, {
   cors: {
     origin: '*', // front-end
-  }, 
+  },
 })
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+app.use(express.static(path.join(__dirname, 'public')))
 //body parser
-app.use(express.json());
+app.use(express.json())
 
 // where we store our data
 const all_rooms = {}
 var timerIntervalId = []
-var clientCounter = 0
 
 const print_rooms = () => {
   console.log('::::::::::::::rooms::::::::::::::')
@@ -72,24 +71,41 @@ const update_player_infos = async (roomID, socketID) => {
   // no more player in room
   if (n_sockets_in_room(roomID) === 0) delete all_rooms[roomID]
 }
+const generate_empty_roomData = (roomID) => {
+  let grid_size = 5
+  if (all_rooms[roomID]['gameOptions'].grid6) grid_size = 6
+  else if (all_rooms[roomID]['gameOptions'].grid8) grid_size = 8
+  else if (all_rooms[roomID]['gameOptions'].grid10) grid_size = 10
+
+  // generate empty board just to show
+  let roomData = {
+    grid_size: grid_size,
+    board: generateEmptyBoard(grid_size),
+  }
+
+  all_rooms[roomID]['roomData'] = roomData
+  return roomData
+}
 
 const generate_new_roomData = (roomID) => {
-  const board = generateBoard() // generate empty board with obstacles
+  const grid_size = all_rooms[roomID]['roomData'].grid_size
+  const board = generateBoard(grid_size) // generate board with obstacles
   const playerIndex = getRandomInt(1) // select player to be warder
-  const w_pos = generateEntityPos(board) // get random pos {x, y}
+  const w_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
   board[w_pos.y][w_pos.x] = 3 // place warder on the board
-  const p_pos = generateEntityPos(board) // get random pos {x, y}
+  const p_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
   board[p_pos.y][p_pos.x] = 4 // place prisoner on the board
 
   const roomData = {
+    grid_size: grid_size,
     board: board,
     warder: all_rooms[roomID]['playerInfos'][playerIndex].socketID,
     prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
     warder_pos: w_pos,
     prisoner_pos: p_pos,
     turn: 'warder',
-    options: all_rooms[roomID]['storeOptions'],
   }
+
   all_rooms[roomID]['roomData'] = roomData
   return roomData
 }
@@ -106,7 +122,7 @@ const skipTurn = (roomID) => {
     roomID,
     timerIntervalId[roomID],
     skipTurn,
-    roomData.options
+    all_rooms[roomID]['gameOptions']
   )
 }
 
@@ -114,7 +130,7 @@ const handle_leave_room = (roomID, socketID) => {
   // if there is no roomID in all_rooms do nothing
   if (!(roomID in all_rooms)) return
 
-  let roomData = { board: generateEmptyBoard() }
+  let roomData = generate_empty_roomData(roomID)
   clearInterval(timerIntervalId[roomID])
   update_player_infos(roomID, socketID)
   io.to(roomID).emit(
@@ -130,23 +146,20 @@ const handle_leave_room = (roomID, socketID) => {
 const startRoom = (roomID) => {
   let roomData = generate_new_roomData(roomID)
 
-  io.to(roomID).emit(
-    'game_start',
-    roomData,
-    all_rooms[roomID]['playerInfos']
-  )
+  io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
 
   timerIntervalId[roomID] = gameTimer(
     io,
     roomID,
     timerIntervalId[roomID],
     skipTurn,
-    roomData.options
+    all_rooms[roomID]['gameOptions']
   )
 }
 
 const resetScore = (roomID) => {
-  for(const [key] of Object.entries(all_rooms[roomID]['playerInfos'])) all_rooms[roomID]['playerInfos'][key]['score'] = 0
+  for (const [key] of Object.entries(all_rooms[roomID]['playerInfos']))
+    all_rooms[roomID]['playerInfos'][key]['score'] = 0
 }
 
 const resetRoom = (roomID) => {
@@ -161,24 +174,21 @@ const reMatch = (roomID) => {
   if (!(roomID in all_rooms)) return
   if (n_sockets_in_room(roomID) !== 2) return
   startRoom(roomID)
-  io.to(roomID).emit(
-    'update_showResult',
-    false
-  )
+  io.to(roomID).emit('update_showResult', false)
   return
 }
-
 
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
   // console.log(`${socket.id} : ${io.engine.clientsCount - 1}`)
   // player join 'lobby' room on initial connect
   socket.join('lobby')
-  io.of('/admin').emit('update player count', io.of("/").sockets.size)
+  io.of('/admin').emit('update player count', io.of('/').sockets.size)
   // console.log(`socket connected ${io.of("/").sockets.size}`)
 
   // ON JOIN ROOM
   socket.on('join_room', async (roomID, playerName, options) => {
+    // room full
     if (n_sockets_in_room(roomID) >= 2) {
       socket.emit('room_full')
       return
@@ -193,22 +203,22 @@ io.on('connection', (socket) => {
       socketID: socket.id,
       score: 0,
       priority: 0,
-      reMatch: false
+      reMatch: false,
     }
 
-    // create room when no room, if already has a player in room push new player
+    // create room when no room. if already has a player in room, push new player
     if (!(roomID in all_rooms)) {
       all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
-      all_rooms[roomID]['storeOptions'] = options
+      all_rooms[roomID]['gameOptions'] = options
     } else {
       all_rooms[roomID]['playerInfos'].push(newPlayerInfo)
     }
 
-    // generate empty board just to show
-    let roomData = { board: generateEmptyBoard() }
-    io.to(roomID).emit('update_roomData', roomData) // start the game
+    // generate empty board just to show to player waiting in the room
+    let roomData = generate_empty_roomData(roomID)
+    io.to(roomID).emit('update_roomData', roomData) // send empty board
 
-    // 2 players in room already
+    // 2 players in room already, start the game
     if (n_sockets_in_room(roomID) === 2) {
       roomData = generate_new_roomData(roomID)
 
@@ -220,13 +230,13 @@ io.on('connection', (socket) => {
 
       timerIntervalId[roomID] = gameTimer(
         io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+        roomID,
+        timerIntervalId[roomID],
+        skipTurn,
+        all_rooms[roomID]['gameOptions']
       )
     }
-    // only 1 player game not started
+    // only 1 player, game does not start
     else {
       io.to(roomID).emit(
         'update_playerInfo',
@@ -269,10 +279,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+          roomID,
+          timerIntervalId[roomID],
+          skipTurn,
+          all_rooms[roomID]['gameOptions']
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'prisoner'
@@ -293,10 +303,10 @@ io.on('connection', (socket) => {
 
         timerIntervalId[roomID] = gameTimer(
           io,
-    roomID,
-    timerIntervalId[roomID],
-    skipTurn,
-    roomData.options
+          roomID,
+          timerIntervalId[roomID],
+          skipTurn,
+          all_rooms[roomID]['gameOptions']
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         roomData.turn = 'warder'
@@ -309,24 +319,32 @@ io.on('connection', (socket) => {
 
   socket.on('rematch', (roomID) => {
     //set want to rematch
-    all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => {
-      if(playerInfo['socketID'] === socket.id) return {
-        ...playerInfo,
-        reMatch : true
-      }; 
-      else return playerInfo
-    })
+    all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+      (playerInfo) => {
+        if (playerInfo['socketID'] === socket.id)
+          return {
+            ...playerInfo,
+            reMatch: true,
+          }
+        else return playerInfo
+      }
+    )
 
     socket.to(roomID).emit('rematch request')
 
-    if(all_rooms[roomID]['playerInfos'][0]['reMatch'] + all_rooms[roomID]['playerInfos'][1]['reMatch'] == 2) {
+    if (
+      all_rooms[roomID]['playerInfos'][0]['reMatch'] +
+        all_rooms[roomID]['playerInfos'][1]['reMatch'] ==
+      2
+    ) {
       reMatch(roomID)
-      all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(playerInfo => ({
+      all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+        (playerInfo) => ({
           ...playerInfo,
-          reMatch : false
-      }))
+          reMatch: false,
+        })
+      )
     }
-
   })
 
   // on client refresh / close
@@ -335,7 +353,7 @@ io.on('connection', (socket) => {
     socket.rooms.forEach((roomID) => {
       handle_leave_room(roomID, socket.id)
     })
-    io.of('/admin').emit('update player count', io.of("/").sockets.size - 1)
+    io.of('/admin').emit('update player count', io.of('/').sockets.size - 1)
     // console.log(`socket disconnected ${io.of("/").sockets.size - 1}`)
   })
 
@@ -343,7 +361,7 @@ io.on('connection', (socket) => {
 })
 
 chatLogic(io)
-adminLogic(app,io,ADMINPORT,resetRoom)
+adminLogic(app, io, ADMINPORT, resetRoom)
 tauntLogic(io)
 
 server.listen(PORT, () => {
