@@ -12,6 +12,7 @@ const options: OptionsInterface = {
   grid8: false,
   grid10: false,
   speedMode: false,
+  shoes: false,
 }
 
 const OptionsButton = () => {

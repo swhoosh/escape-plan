@@ -69,6 +69,7 @@ const Tile = ({
   const { gameData } = useContext(GameContext)
   const [activateTaunt, setActivateTaunt] = useState<boolean>(false)
   const [transition, setTransition] = useState<boolean>(false)
+
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
@@ -79,6 +80,11 @@ const Tile = ({
     }
   }
 
+  const getDistance = (from: any, to: any) => {
+    return Math.abs(from.y - to.y) + Math.abs(from.x - to.x)
+    // Math.sqrt(Math.pow(from.y - to.y, 2) + Math.pow(from.x - to.x, 2))
+  }
+
   const validMove = () => {
     // not my turn
     if (!gameData.myTurn) return false
@@ -87,8 +93,12 @@ const Tile = ({
     // player is warder
     if (gameData.role === 'warder') {
       if (
-        Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
+        // Math.abs(gameData.roomData.warder_pos.x - j) >
+        //   gameData['roomData'].warder_step ||
+        // Math.abs(gameData.roomData.warder_pos.y - i) >
+        //   gameData['roomData'].warder_step ||
+        getDistance(gameData.roomData.warder_pos, { x: j, y: i }) >
+          gameData['roomData'].warder_step ||
         tileValue === 2
       )
         return false
@@ -96,14 +106,19 @@ const Tile = ({
     // player is prisoner
     if (gameData.role === 'prisoner') {
       if (
-        Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
+        // Math.abs(gameData.roomData.prisoner_pos.x - j) >
+        //   gameData['roomData'].prisoner_step ||
+        // Math.abs(gameData.roomData.prisoner_pos.y - i) >
+        //   gameData['roomData'].prisoner_step ||
+        getDistance(gameData.roomData.prisoner_pos, { x: j, y: i }) >
+          gameData['roomData'].prisoner_step ||
         tileValue === 3
       )
         return false
     }
     return true
   }
+
   useEffect(() => {
     if (showTaunt === 'warder' && tileValue === 3) {
       setActivateTaunt(true)
@@ -135,15 +150,30 @@ const Tile = ({
         className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* <span className='m-auto text-xl'>Goal</span> */}
-        {/* {validMove() && <span className='dot'></span>} */}
-      </button>
+      ></button>
     )
   if (tileValue === 3)
     return (
       <button
         className='tile bg-drac_red group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      >
+        {activateTaunt ? (
+          <img
+            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+              transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
+            }`}
+            src='/taunt.png'
+            alt=''
+          />
+        ) : null}
+      </button>
+    )
+  if (tileValue === 4)
+    return (
+      <button
+        className='tile bg-drac_cyan group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -178,17 +208,23 @@ const Tile = ({
         ) : null}
       </button>
     )
+  // shoes
+  if (tileValue === 5)
+    return (
+      <button
+        className='tile bg-drac_purple group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      ></button>
+    )
   //normal block
   else
     return (
       <button
-        // className='tile bg-drac_lightgrey opacity-20 group'
         className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* {validMove() && <span className='dot' />} */}
-      </button>
+      ></button>
     )
 }
 

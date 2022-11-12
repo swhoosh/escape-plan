@@ -7,6 +7,7 @@
     2 : tunnel
     3 : warder
     4 : prisoner
+    5 : ski
 */
 
 // export const setGridSize = (x) => {
@@ -77,6 +78,8 @@ export const checkWin = (role, x, y, board) => {
   if (role === 'prisoner' && board[y][x] === 2) return true
   return false
 }
+
+export const checkItem = (role, x, y, board) => {}
 
 // var board = generateBoard()
 // board.forEach((row) => console.log(row))
