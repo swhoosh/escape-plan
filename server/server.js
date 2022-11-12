@@ -88,6 +88,13 @@ const generateEmptyRoomData = (roomID) => {
 }
 
 const generateShoes = (roomID) => {
+  if (!all_rooms[roomID]['gameOptions'].shoes) return
+  if (all_rooms[roomID]['roomData'].shoesLeft <= 0) return
+
+  // amount of shoes left - 1
+  all_rooms[roomID]['roomData'].shoesLeft--
+
+  // generate shoes
   const shoes_pos = generateEntityPos(
     all_rooms[roomID]['roomData'].board,
     all_rooms[roomID]['roomData'].grid_size
@@ -112,12 +119,14 @@ const generateNewRoomData = (roomID) => {
     prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
     warder_pos: w_pos,
     prisoner_pos: p_pos,
+    warder_step: 1,
+    prisoner_step: 1,
+    shoesLeft: Math.floor(grid_size / 2),
     turn: 'warder',
   }
   all_rooms[roomID]['roomData'] = roomData
 
   // special power
-  // if (all_rooms[roomID]['gameOptions'].shoes)
   generateShoes(roomID)
 
   return roomData
@@ -276,16 +285,25 @@ io.on('connection', (socket) => {
     if (roomData.turn !== role) return //not my turn
     roomData.turn = 'none'
 
+    // warder move
     if (roomData.warder === socket.id) {
+      // win
       if (checkWin('warder', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'warder')
         clearInterval(timerIntervalId[roomID])
-      } else {
-        const old_pos = roomData.warder_pos
-        all_rooms[roomID].roomData.board[y][x] = 3 // move warder in board
+      }
+      // not win yet
+      else {
+        // check for shoes
+        if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
+          all_rooms[roomID]['roomData'].warder_step++
+          generateShoes(roomID)
+        }
 
+        const old_pos = roomData.warder_pos
+        all_rooms[roomID]['roomData'].board[y][x] = 3 // move warder in board
         if (old_pos.y === y && old_pos.x === x);
-        else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
+        else all_rooms[roomID]['roomData'].board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
 
         all_rooms[roomID]['roomData']['warder_pos'] = { x: x, y: y }
         all_rooms[roomID]['roomData']['turn'] = 'prisoner'
@@ -298,16 +316,22 @@ io.on('connection', (socket) => {
           all_rooms[roomID]['gameOptions']
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
-        roomData.turn = 'prisoner'
       }
+      // prisoner move
     } else if (roomData.prisoner === socket.id) {
+      // win
       if (checkWin('prisoner', x, y, roomData.board)) {
         io.to(roomID).emit('player_won', 'prisoner')
         clearInterval(timerIntervalId[roomID])
       } else {
+        // check for shoes
+        if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
+          all_rooms[roomID]['roomData'].prisoner_step++
+          generateShoes(roomID)
+        }
+
         const old_pos = roomData.prisoner_pos
         all_rooms[roomID].roomData.board[y][x] = 4 // move prisoner in board
-
         if (old_pos.y === y && old_pos.x === x);
         else all_rooms[roomID].roomData.board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
 
@@ -322,11 +346,10 @@ io.on('connection', (socket) => {
           all_rooms[roomID]['gameOptions']
         )
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
-        roomData.turn = 'warder'
       }
     }
 
-    io.to(roomID).emit('update_roomData', all_rooms[roomID].roomData)
+    io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
     print_rooms()
   })
 

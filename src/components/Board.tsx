@@ -69,6 +69,7 @@ const Tile = ({
   const { gameData } = useContext(GameContext)
   const [activateTaunt, setActivateTaunt] = useState<boolean>(false)
   const [transition, setTransition] = useState<boolean>(false)
+
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
@@ -87,8 +88,10 @@ const Tile = ({
     // player is warder
     if (gameData.role === 'warder') {
       if (
-        Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
+        Math.abs(gameData.roomData.warder_pos.x - j) >
+          gameData['roomData'].warder_step ||
+        Math.abs(gameData.roomData.warder_pos.y - i) >
+          gameData['roomData'].warder_step ||
         tileValue === 2
       )
         return false
@@ -96,14 +99,17 @@ const Tile = ({
     // player is prisoner
     if (gameData.role === 'prisoner') {
       if (
-        Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
+        Math.abs(gameData.roomData.prisoner_pos.x - j) >
+          gameData['roomData'].prisoner_step ||
+        Math.abs(gameData.roomData.prisoner_pos.y - i) >
+          gameData['roomData'].prisoner_step ||
         tileValue === 3
       )
         return false
     }
     return true
   }
+
   useEffect(() => {
     if (showTaunt === 'warder' && tileValue === 3) {
       setActivateTaunt(true)
