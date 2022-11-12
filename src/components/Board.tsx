@@ -135,15 +135,30 @@ const Tile = ({
         className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* <span className='m-auto text-xl'>Goal</span> */}
-        {/* {validMove() && <span className='dot'></span>} */}
-      </button>
+      ></button>
     )
   if (tileValue === 3)
     return (
       <button
         className='tile bg-drac_red group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      >
+        {activateTaunt ? (
+          <img
+            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+              transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
+            }`}
+            src='/taunt.png'
+            alt=''
+          />
+        ) : null}
+      </button>
+    )
+  if (tileValue === 4)
+    return (
+      <button
+        className='tile bg-drac_cyan group'
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -178,17 +193,23 @@ const Tile = ({
         ) : null}
       </button>
     )
+  // shoes
+  if (tileValue === 5)
+    return (
+      <button
+        className='tile bg-drac_purple group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      ></button>
+    )
   //normal block
   else
     return (
       <button
-        // className='tile bg-drac_lightgrey opacity-20 group'
         className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* {validMove() && <span className='dot' />} */}
-      </button>
+      ></button>
     )
 }
 

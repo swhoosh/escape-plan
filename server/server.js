@@ -71,7 +71,7 @@ const update_player_infos = async (roomID, socketID) => {
   // no more player in room
   if (n_sockets_in_room(roomID) === 0) delete all_rooms[roomID]
 }
-const generate_empty_roomData = (roomID) => {
+const generateEmptyRoomData = (roomID) => {
   let grid_size = 5
   if (all_rooms[roomID]['gameOptions'].grid6) grid_size = 6
   else if (all_rooms[roomID]['gameOptions'].grid8) grid_size = 8
@@ -87,14 +87,23 @@ const generate_empty_roomData = (roomID) => {
   return roomData
 }
 
-const generate_new_roomData = (roomID) => {
+const generateShoes = (roomID) => {
+  const shoes_pos = generateEntityPos(
+    all_rooms[roomID]['roomData'].board,
+    all_rooms[roomID]['roomData'].grid_size
+  )
+  all_rooms[roomID]['roomData'].board[shoes_pos.y][shoes_pos.x] = 5 // place shoes on board
+  all_rooms[roomID]['roomData'].shoes_pos = shoes_pos
+}
+
+const generateNewRoomData = (roomID) => {
   const grid_size = all_rooms[roomID]['roomData'].grid_size
   const board = generateBoard(grid_size) // generate board with obstacles
   const playerIndex = getRandomInt(1) // select player to be warder
   const w_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
-  board[w_pos.y][w_pos.x] = 3 // place warder on the board
+  board[w_pos.y][w_pos.x] = 3 // place warder on board
   const p_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
-  board[p_pos.y][p_pos.x] = 4 // place prisoner on the board
+  board[p_pos.y][p_pos.x] = 4 // place prisoner on board
 
   const roomData = {
     grid_size: grid_size,
@@ -105,8 +114,12 @@ const generate_new_roomData = (roomID) => {
     prisoner_pos: p_pos,
     turn: 'warder',
   }
-
   all_rooms[roomID]['roomData'] = roomData
+
+  // special power
+  // if (all_rooms[roomID]['gameOptions'].shoes)
+  generateShoes(roomID)
+
   return roomData
 }
 
@@ -130,7 +143,7 @@ const handle_leave_room = (roomID, socketID) => {
   // if there is no roomID in all_rooms do nothing
   if (!(roomID in all_rooms)) return
 
-  let roomData = generate_empty_roomData(roomID)
+  let roomData = generateEmptyRoomData(roomID)
   clearInterval(timerIntervalId[roomID])
   update_player_infos(roomID, socketID)
   io.to(roomID).emit(
@@ -144,7 +157,7 @@ const handle_leave_room = (roomID, socketID) => {
 }
 
 const startRoom = (roomID) => {
-  let roomData = generate_new_roomData(roomID)
+  let roomData = generateNewRoomData(roomID)
 
   io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
 
@@ -215,12 +228,12 @@ io.on('connection', (socket) => {
     }
 
     // generate empty board just to show to player waiting in the room
-    let roomData = generate_empty_roomData(roomID)
+    let roomData = generateEmptyRoomData(roomID)
     io.to(roomID).emit('update_roomData', roomData) // send empty board
 
     // 2 players in room already, start the game
     if (n_sockets_in_room(roomID) === 2) {
-      roomData = generate_new_roomData(roomID)
+      roomData = generateNewRoomData(roomID)
 
       io.to(roomID).emit(
         'game_start',
