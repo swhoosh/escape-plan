@@ -80,6 +80,11 @@ const Tile = ({
     }
   }
 
+  const getDistance = (from: any, to: any) => {
+    return Math.abs(from.y - to.y) + Math.abs(from.x - to.x)
+    // Math.sqrt(Math.pow(from.y - to.y, 2) + Math.pow(from.x - to.x, 2))
+  }
+
   const validMove = () => {
     // not my turn
     if (!gameData.myTurn) return false
@@ -88,9 +93,11 @@ const Tile = ({
     // player is warder
     if (gameData.role === 'warder') {
       if (
-        Math.abs(gameData.roomData.warder_pos.x - j) >
-          gameData['roomData'].warder_step ||
-        Math.abs(gameData.roomData.warder_pos.y - i) >
+        // Math.abs(gameData.roomData.warder_pos.x - j) >
+        //   gameData['roomData'].warder_step ||
+        // Math.abs(gameData.roomData.warder_pos.y - i) >
+        //   gameData['roomData'].warder_step ||
+        getDistance(gameData.roomData.warder_pos, { x: j, y: i }) >
           gameData['roomData'].warder_step ||
         tileValue === 2
       )
@@ -99,9 +106,11 @@ const Tile = ({
     // player is prisoner
     if (gameData.role === 'prisoner') {
       if (
-        Math.abs(gameData.roomData.prisoner_pos.x - j) >
-          gameData['roomData'].prisoner_step ||
-        Math.abs(gameData.roomData.prisoner_pos.y - i) >
+        // Math.abs(gameData.roomData.prisoner_pos.x - j) >
+        //   gameData['roomData'].prisoner_step ||
+        // Math.abs(gameData.roomData.prisoner_pos.y - i) >
+        //   gameData['roomData'].prisoner_step ||
+        getDistance(gameData.roomData.prisoner_pos, { x: j, y: i }) >
           gameData['roomData'].prisoner_step ||
         tileValue === 3
       )
