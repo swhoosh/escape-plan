@@ -92,8 +92,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
     return (
       <div className='flex flex-row mt-1 text-[2vh]' key={key}>
         <p className='break-all'>
-          <span className='text-slate-200 pl-1'>{name} : </span>
-          <span className='text-slate-400'>{msg}</span>
+          <span className='text-slate-400 pl-1'>{name} : </span>
+          <span className=' text-drac_lightgrey'>{msg}</span>
         </p>
       </div>
     )
@@ -102,12 +102,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
   const chat = () => {
     var i = chatData.message.length - 1
     var chatBuffer = []
+
     while (i >= 0) {
       chatBuffer.push(
         chatRow(chatData.message[i], chatData.name[i], chatData.dateTime[i], i)
       )
       i--
     }
+
+    chatBuffer.push(
+      <div className='flex flex-col mt-1 text-sm'>
+        <span className='text-slate-200/50 pl-1'>Welcome to Escape Plan!</span>
+        <span className='text-drac_lightgrey text-sm pl-1'>
+          waiting for another player...
+        </span>
+      </div>
+    )
+
     return chatBuffer
   }
 
