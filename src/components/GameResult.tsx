@@ -9,13 +9,23 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   const [ rematchColB,setRematchColB ] = useState("bg-drac_green")
   const [ meRequester,setMeRequester ] = useState(false)
 
-  if (gameData.showResult) {
-    playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  // if (gameData.showResult) {
+  //   playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  //   playerInfos[0]['role'] = role
+  //   if (playerInfos.length > 1) {
+  //     playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+  //   }
+  // }
+
+  useEffect(() => {
+    playerInfos = gameData.playerInfos.sort((a: any, b: any) => b.priority - a.priority)
     playerInfos[0]['role'] = role
     if (playerInfos.length > 1) {
       playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
     }
-  }
+  }, [gameData.playerInfo])
+
+  
 
   const onLeave = () => {
     // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)

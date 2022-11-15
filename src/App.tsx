@@ -64,6 +64,7 @@ const App = () => {
         playerInfos: playerInfos,
         showPlayerInfos: showPlayerInfos,
       }))
+      console.log(playerInfos)
     })
 
     gameData.socket.on('game_start', (roomData, playerInfos) => {
@@ -209,7 +210,7 @@ const App = () => {
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {/* Result Screen */}
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} /> 
         ) : null}
 
         {/* Main container */}
