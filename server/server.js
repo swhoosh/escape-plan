@@ -71,6 +71,11 @@ const update_player_infos = async (roomID, socketID) => {
   // no more player in room
   if (n_sockets_in_room(roomID) === 0) delete all_rooms[roomID]
 }
+
+const updateGameOptions = (roomID) => {
+  io.to(roomID).emit('update_gameOptions', all_rooms[roomID]['gameOptions'])
+}
+
 const generateEmptyRoomData = (roomID) => {
   let grid_size = 5
   if (all_rooms[roomID]['gameOptions'].grid6) grid_size = 6
@@ -103,6 +108,13 @@ const generateShoes = (roomID) => {
   all_rooms[roomID]['roomData'].shoes_pos = shoes_pos
 }
 
+const setStealthTime = (grid_size, stealthTime) => {
+  if (stealthTime === 0) stealthTime = Math.floor((grid_size + 1) / 5) * 2
+  else stealthTime--
+
+  return stealthTime
+}
+
 const generateNewRoomData = (roomID) => {
   const grid_size = all_rooms[roomID]['roomData'].grid_size
   const board = generateBoard(grid_size) // generate board with obstacles
@@ -121,7 +133,8 @@ const generateNewRoomData = (roomID) => {
     prisoner_pos: p_pos,
     warder_step: 1,
     prisoner_step: 1,
-    shoesLeft: Math.floor(grid_size / 2),
+    shoesLeft: Math.floor(grid_size / 3),
+    stealthTime: Math.floor((grid_size + 1) / 5) * 2,
     turn: 'warder',
   }
   all_rooms[roomID]['roomData'] = roomData
@@ -242,6 +255,8 @@ io.on('connection', (socket) => {
 
     // 2 players in room already, start the game
     if (n_sockets_in_room(roomID) === 2) {
+      updateGameOptions(roomID)
+
       roomData = generateNewRoomData(roomID)
 
       io.to(roomID).emit(
@@ -277,13 +292,20 @@ io.on('connection', (socket) => {
     socket.leave(roomID)
   })
 
-  // ON CLICK TILE
+  // ||||||||||||||| ON CLICK TILE |||||||||||||||
   socket.on('clicked_tile', (roomID, x, y) => {
     const roomData = all_rooms[roomID]['roomData']
     const role = roomData.warder === socket.id ? 'warder' : 'prisoner'
     const enemy_role = roomData.warder !== socket.id ? 'warder' : 'prisoner'
     if (roomData.turn !== role) return //not my turn
     roomData.turn = 'none'
+
+    if (all_rooms[roomID]['gameOptions'].stealth) {
+      all_rooms[roomID]['roomData']['stealthTime'] = setStealthTime(
+        roomData.grid_size,
+        roomData.stealthTime
+      )
+    }
 
     // warder move
     if (roomData.warder === socket.id) {
@@ -308,6 +330,7 @@ io.on('connection', (socket) => {
       else {
         // check for shoes
         if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
+          all_rooms[roomID]['roomData'].warder_step++
           generateShoes(roomID)
         }
 
@@ -377,7 +400,6 @@ io.on('connection', (socket) => {
       all_rooms[roomID]['playerInfos'],
       true
     )
-
     io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
     print_rooms()
   })
