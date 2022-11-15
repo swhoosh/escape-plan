@@ -108,6 +108,22 @@ const generateShoes = (roomID) => {
   all_rooms[roomID]['roomData'].shoes_pos = shoes_pos
 }
 
+const generateKeys = (roomID) => {
+  if (!all_rooms[roomID]['gameOptions'].keys) return
+  if (all_rooms[roomID]['roomData'].keysLeft <= 0) return
+
+  // amount of keys left - 1
+  all_rooms[roomID]['roomData'].keysLeft--
+
+  // generate keys
+  const keys_pos = generateEntityPos(
+    all_rooms[roomID]['roomData'].board,
+    all_rooms[roomID]['roomData'].grid_size
+  )
+  all_rooms[roomID]['roomData'].board[keys_pos.y][keys_pos.x] = 6 // place keyss on board
+  all_rooms[roomID]['roomData'].keys_pos = keys_pos
+}
+
 const setStealthTime = (grid_size, stealthTime) => {
   if (stealthTime === 0) stealthTime = Math.floor((grid_size + 1) / 5) * 2
   else stealthTime--
@@ -134,6 +150,7 @@ const generateNewRoomData = (roomID) => {
     warder_step: 1,
     prisoner_step: 1,
     shoesLeft: Math.floor(grid_size / 3),
+    keysLeft: 1,
     stealthTime: Math.floor((grid_size + 1) / 5) * 2,
     turn: 'warder',
   }
@@ -141,6 +158,7 @@ const generateNewRoomData = (roomID) => {
 
   // special power
   generateShoes(roomID)
+  generateKeys(roomID)
 
   return roomData
 }
@@ -316,11 +334,12 @@ io.on('connection', (socket) => {
             if (playerInfo['socketID'] === socket.id)
               return {
                 ...playerInfo,
-                score: playerInfo.score + 1,
+                score: playerInfo.score + 1 + (all_rooms[roomID]['roomData'].haveKey == role),
               }
             else return playerInfo
           }
         )
+        delete all_rooms[roomID]['roomData'].haveKey
         io.to(roomID).emit('player_won', 'warder')
         socket.emit('result', 'win')
         socket.to(roomID).emit('result', 'lost')
@@ -332,6 +351,11 @@ io.on('connection', (socket) => {
         if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
           all_rooms[roomID]['roomData'].warder_step++
           generateShoes(roomID)
+        }
+        
+        if (all_rooms[roomID]['roomData'].board[y][x] === 6) {
+          all_rooms[roomID]['roomData'].haveKey = role
+          //generateKeys(roomID)
         }
 
         const old_pos = roomData.warder_pos
@@ -360,11 +384,12 @@ io.on('connection', (socket) => {
             if (playerInfo['socketID'] === socket.id)
               return {
                 ...playerInfo,
-                score: playerInfo.score + 1,
+                score: playerInfo.score + 1 + (all_rooms[roomID]['roomData'].haveKey == role),
               }
             else return playerInfo
           }
         )
+        delete all_rooms[roomID]['roomData'].haveKey
         io.to(roomID).emit('player_won', 'prisoner')
         socket.emit('result', 'win')
         socket.to(roomID).emit('result', 'lost')
@@ -374,6 +399,11 @@ io.on('connection', (socket) => {
         if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
           all_rooms[roomID]['roomData'].prisoner_step++
           generateShoes(roomID)
+        }
+
+        if (all_rooms[roomID]['roomData'].board[y][x] === 6) {
+          all_rooms[roomID]['roomData'].haveKey = role
+          //generateKeys(roomID)
         }
 
         const old_pos = roomData.prisoner_pos
