@@ -2,10 +2,10 @@ import { RiVipCrownFill } from 'react-icons/ri'
 import { useContext, useEffect, useState } from 'react'
 import { GameContext } from '../App'
 
-const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
+const GameResult = ({ role }: { role: any }) => {
   const { gameData, setGameData } = useContext(GameContext)
   const [ rematchRequest, setRematchRequest ] = useState(false)
-  const [ rematchColA,setRematchColA ] = useState("drac_darkgreen")
+  const [ rematchColA,setRematchColA ] = useState("drac_darkgreen") //can't dynamicly change classname to change col gotta use style
   const [ rematchColB,setRematchColB ] = useState("bg-drac_green")
   const [ meRequester,setMeRequester ] = useState(false)
 
@@ -17,15 +17,11 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   //   }
   // }
 
-  useEffect(() => {
-    playerInfos = gameData.playerInfos.sort((a: any, b: any) => b.priority - a.priority)
-    playerInfos[0]['role'] = role
-    if (playerInfos.length > 1) {
-      playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
-    }
-  }, [gameData.playerInfo])
-
-  
+  var playerInfos = gameData.playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  playerInfos[0]['role'] = role
+  if (playerInfos.length > 1) {
+    playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+  }
 
   const onLeave = () => {
     // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)
