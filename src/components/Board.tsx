@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
-import { socketChat } from '../service/socket'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
@@ -78,6 +77,8 @@ const Tile = ({
         gameData.myTurn = false
       }
     }
+
+    console.log(gameData.roomData.stealthTime)
   }
 
   const getDistance = (from: any, to: any) => {
@@ -148,10 +149,19 @@ const Tile = ({
         onClick={handleOnClick}
       ></button>
     )
+  // warder
   if (tileValue === 3)
     return (
       <button
-        className='tile bg-drac_red group'
+        className={`tile ${
+          gameData.options.stealth && gameData.roomData.stealthTime !== 0
+            ? `${
+                gameData.role === 'warder'
+                  ? 'bg-drac_red/50'
+                  : 'bg-drac_grey/30'
+              }`
+            : 'bg-drac_red'
+        } group`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -166,29 +176,19 @@ const Tile = ({
         ) : null}
       </button>
     )
+  // prisoner
   if (tileValue === 4)
     return (
       <button
-        className='tile bg-drac_cyan group'
-        disabled={!validMove()}
-        onClick={handleOnClick}
-      >
-        {/* {validMove() && <span className='dot'></span>} */}
-        {activateTaunt ? (
-          <img
-            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
-              transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
-            }`}
-            src='/taunt.png'
-            alt=''
-          />
-        ) : null}
-      </button>
-    )
-  if (tileValue === 4)
-    return (
-      <button
-        className='tile bg-drac_cyan group'
+        className={`tile ${
+          gameData.options.stealth && gameData.roomData.stealthTime !== 0
+            ? `${
+                gameData.role === 'prisoner'
+                  ? 'bg-drac_cyan/50'
+                  : 'bg-drac_grey/30'
+              }`
+            : 'bg-drac_cyan'
+        } group`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
@@ -217,7 +217,7 @@ const Tile = ({
   else
     return (
       <button
-        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
+        className='tile bg-drac_grey disabled:opacity-30 group'
         disabled={!validMove()}
         onClick={handleOnClick}
       ></button>

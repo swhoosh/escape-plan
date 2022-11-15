@@ -32,7 +32,7 @@ const App = () => {
     showPlayerInfos: false,
     playerInfos: {},
     showResult: false,
-    result : ''
+    result: '',
   })
 
   const [noticeText, setNoticeText] = useState('')
@@ -146,17 +146,17 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('update_playing', (playing) => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        playing: playing,
-      }))
-    })
-
     gameData.socket.on('update_showResult', (showResult) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         showResult: showResult,
+      }))
+    })
+
+    gameData.socket.on('update_gameOptions', (options) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        options: options,
       }))
     })
 
@@ -166,7 +166,6 @@ const App = () => {
         ...prevGameData,
         playing: false,
         showResult: true,
-        
       }))
       // onLog()
     })
@@ -193,8 +192,8 @@ const App = () => {
       }))
       // console.log('skip turn')
     })
-  
-    gameData.socket.on('result',(result)=>{
+
+    gameData.socket.on('result', (result) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         result: result,
@@ -219,7 +218,7 @@ const App = () => {
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {/* Result Screen */}
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} /> 
+          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
         ) : null}
 
         {/* Main container */}
