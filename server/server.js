@@ -300,6 +300,8 @@ io.on('connection', (socket) => {
           }
         )
         io.to(roomID).emit('player_won', 'warder')
+        socket.emit('result', 'win')
+        socket.to(roomID).emit('result', 'lost')
         clearInterval(timerIntervalId[roomID])
       }
       // not win yet
@@ -340,7 +342,9 @@ io.on('connection', (socket) => {
             else return playerInfo
           }
         )
-        io.to(roomID).emit('player_won', 'prisoner') 
+        io.to(roomID).emit('player_won', 'prisoner')
+        socket.emit('result', 'win')
+        socket.to(roomID).emit('result', 'lost')
         clearInterval(timerIntervalId[roomID])
       } else {
         // check for shoes

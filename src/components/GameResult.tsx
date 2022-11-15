@@ -58,7 +58,8 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
        m-auto p-10 w-1/2 max-w-[700px] h-[60%] max-h-[720px] justify-evenly
        bg-drac_black rounded-xl z-50 border'
       >
-        <div className='text-7xl text-center'>Victory</div>
+        {gameData.result === 'win' && <div className='text-7xl text-center'>VICTORY</div>}
+        {gameData.result !== 'win' && <div className='text-7xl text-center'>DEFEAT</div>}
         <div className='grid grid-cols-2 gap-20'>
           {playerInfos.map((playerInfo: any) => {
             return (
