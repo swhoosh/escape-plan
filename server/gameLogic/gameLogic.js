@@ -7,7 +7,8 @@
     2 : tunnel
     3 : warder
     4 : prisoner
-    5 : ski
+    5 : shoes
+    6 : key
 */
 
 // export const setGridSize = (x) => {

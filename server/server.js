@@ -120,7 +120,7 @@ const generateKeys = (roomID) => {
     all_rooms[roomID]['roomData'].board,
     all_rooms[roomID]['roomData'].grid_size
   )
-  all_rooms[roomID]['roomData'].board[keys_pos.y][keys_pos.x] = 6 // place keyss on board
+  all_rooms[roomID]['roomData'].board[keys_pos.y][keys_pos.x] = 6 // place keys on board
   all_rooms[roomID]['roomData'].keys_pos = keys_pos
 }
 
@@ -334,7 +334,10 @@ io.on('connection', (socket) => {
             if (playerInfo['socketID'] === socket.id)
               return {
                 ...playerInfo,
-                score: playerInfo.score + 1 + (all_rooms[roomID]['roomData'].haveKey == role),
+                score:
+                  playerInfo.score +
+                  1 +
+                  (all_rooms[roomID]['roomData'].haveKey == role),
               }
             else return playerInfo
           }
@@ -352,7 +355,7 @@ io.on('connection', (socket) => {
           all_rooms[roomID]['roomData'].warder_step++
           generateShoes(roomID)
         }
-        
+
         if (all_rooms[roomID]['roomData'].board[y][x] === 6) {
           all_rooms[roomID]['roomData'].haveKey = role
           //generateKeys(roomID)
@@ -384,7 +387,10 @@ io.on('connection', (socket) => {
             if (playerInfo['socketID'] === socket.id)
               return {
                 ...playerInfo,
-                score: playerInfo.score + 1 + (all_rooms[roomID]['roomData'].haveKey == role),
+                score:
+                  playerInfo.score +
+                  1 +
+                  (all_rooms[roomID]['roomData'].haveKey == role),
               }
             else return playerInfo
           }
