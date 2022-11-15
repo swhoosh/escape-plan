@@ -218,7 +218,7 @@ const App = () => {
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {/* Result Screen */}
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+          <GameResult role={gameData.role} />
         ) : null}
 
         {/* Main container */}
