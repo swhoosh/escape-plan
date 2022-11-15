@@ -289,14 +289,25 @@ io.on('connection', (socket) => {
     if (roomData.warder === socket.id) {
       // win
       if (checkWin('warder', x, y, roomData.board)) {
+        all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+          (playerInfo) => {
+            if (playerInfo['socketID'] === socket.id)
+              return {
+                ...playerInfo,
+                score: playerInfo.score + 1,
+              }
+            else return playerInfo
+          }
+        )
         io.to(roomID).emit('player_won', 'warder')
+        socket.emit('result', 'win')
+        socket.to(roomID).emit('result', 'lost')
         clearInterval(timerIntervalId[roomID])
       }
       // not win yet
       else {
         // check for shoes
         if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
-          all_rooms[roomID]['roomData'].warder_step++
           generateShoes(roomID)
         }
 
@@ -321,7 +332,19 @@ io.on('connection', (socket) => {
     } else if (roomData.prisoner === socket.id) {
       // win
       if (checkWin('prisoner', x, y, roomData.board)) {
+        all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+          (playerInfo) => {
+            if (playerInfo['socketID'] === socket.id)
+              return {
+                ...playerInfo,
+                score: playerInfo.score + 1,
+              }
+            else return playerInfo
+          }
+        )
         io.to(roomID).emit('player_won', 'prisoner')
+        socket.emit('result', 'win')
+        socket.to(roomID).emit('result', 'lost')
         clearInterval(timerIntervalId[roomID])
       } else {
         // check for shoes
@@ -348,6 +371,12 @@ io.on('connection', (socket) => {
         socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
       }
     }
+
+    io.to(roomID).emit(
+      'update_playerInfo',
+      all_rooms[roomID]['playerInfos'],
+      true
+    )
 
     io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
     print_rooms()

@@ -9,13 +9,23 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
   const [ rematchColB,setRematchColB ] = useState("bg-drac_green")
   const [ meRequester,setMeRequester ] = useState(false)
 
-  if (gameData.showResult) {
-    playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  // if (gameData.showResult) {
+  //   playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  //   playerInfos[0]['role'] = role
+  //   if (playerInfos.length > 1) {
+  //     playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+  //   }
+  // }
+
+  useEffect(() => {
+    playerInfos = gameData.playerInfos.sort((a: any, b: any) => b.priority - a.priority)
     playerInfos[0]['role'] = role
     if (playerInfos.length > 1) {
       playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
     }
-  }
+  }, [gameData.playerInfo])
+
+  
 
   const onLeave = () => {
     // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)
@@ -48,7 +58,8 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
        m-auto p-10 w-1/2 max-w-[700px] h-[60%] max-h-[720px] justify-evenly
        bg-drac_black rounded-xl z-50 border'
       >
-        <div className='text-7xl text-center'>Victory</div>
+        {gameData.result === 'win' && <div className='text-7xl text-center'>VICTORY</div>}
+        {gameData.result !== 'win' && <div className='text-7xl text-center'>DEFEAT</div>}
         <div className='grid grid-cols-2 gap-20'>
           {playerInfos.map((playerInfo: any) => {
             return (

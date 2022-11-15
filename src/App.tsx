@@ -32,6 +32,7 @@ const App = () => {
     showPlayerInfos: false,
     playerInfos: {},
     showResult: false,
+    result : ''
   })
 
   const [noticeText, setNoticeText] = useState('')
@@ -64,6 +65,7 @@ const App = () => {
         playerInfos: playerInfos,
         showPlayerInfos: showPlayerInfos,
       }))
+      console.log(playerInfos)
     })
 
     gameData.socket.on('game_start', (roomData, playerInfos) => {
@@ -164,6 +166,7 @@ const App = () => {
         ...prevGameData,
         playing: false,
         showResult: true,
+        
       }))
       // onLog()
     })
@@ -180,7 +183,7 @@ const App = () => {
         ...prevGameData,
         myTurn: true,
       }))
-      console.log('my turn')
+      // console.log('my turn')
     })
 
     gameData.socket.on('skip_turn', () => {
@@ -188,7 +191,14 @@ const App = () => {
         ...prevGameData,
         myTurn: false,
       }))
-      console.log('skip turn')
+      // console.log('skip turn')
+    })
+  
+    gameData.socket.on('result',(result)=>{
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        result: result,
+      }))
     })
 
     return () => {
@@ -209,7 +219,7 @@ const App = () => {
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {/* Result Screen */}
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} /> 
         ) : null}
 
         {/* Main container */}
