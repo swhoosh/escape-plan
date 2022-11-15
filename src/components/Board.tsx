@@ -213,6 +213,15 @@ const Tile = ({
         onClick={handleOnClick}
       ></button>
     )
+
+    if (tileValue === 6)
+    return (
+      <button
+        className='tile bg-drac_yellow group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      ></button>
+    )
   //normal block
   else
     return (

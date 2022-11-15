@@ -65,7 +65,7 @@ const App = () => {
         playerInfos: playerInfos,
         showPlayerInfos: showPlayerInfos,
       }))
-      console.log(playerInfos)
+      // console.log(playerInfos)
     })
 
     gameData.socket.on('game_start', (roomData, playerInfos) => {

@@ -13,6 +13,7 @@ const options: OptionsInterface = {
   grid10: false,
   speedMode: false,
   shoes: false,
+  keys: false,
   stealth: false,
 }
 
