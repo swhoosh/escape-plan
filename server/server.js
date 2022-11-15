@@ -289,7 +289,16 @@ io.on('connection', (socket) => {
     if (roomData.warder === socket.id) {
       // win
       if (checkWin('warder', x, y, roomData.board)) {
-        all_rooms[roomID]['playerInfos'][0]['score']++
+        all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
+          (playerInfo) => {
+            if (playerInfo['socketID'] === socket.id)
+              return {
+                ...playerInfo,
+                score: playerInfo.score + 1,
+              }
+            else return playerInfo
+          }
+        )
         io.to(roomID).emit('player_won', 'warder')
         clearInterval(timerIntervalId[roomID])
       }
@@ -297,16 +306,6 @@ io.on('connection', (socket) => {
       else {
         // check for shoes
         if (all_rooms[roomID]['roomData'].board[y][x] === 5) {
-          all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
-            (playerInfo) => {
-              if (playerInfo['socketID'] === socket.id)
-                return {
-                  ...playerInfo,
-                  score: playerInfo.score + 1,
-                }
-              else return playerInfo
-            }
-          )
           generateShoes(roomID)
         }
 
@@ -374,7 +373,7 @@ io.on('connection', (socket) => {
       all_rooms[roomID]['playerInfos'],
       true
     )
-    
+
     io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
     print_rooms()
   })
