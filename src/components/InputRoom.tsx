@@ -1,17 +1,13 @@
 import { useState, useContext } from 'react'
 import { GameContext } from '../App'
-import popOnAudio from '../sounds/bubble.mp3'
+
+import SoundEffect from '../sounds/SoundEffect'
 
 const InputRoom = () => {
   const { gameData, setGameData } = useContext(GameContext)
   const [name, setName] = useState('')
   const [roomID, setRoomID] = useState('')
   const [roomStatus, setRoomStatus] = useState('')
-
-  const playPopOn = () => {
-    const popOn = new Audio(popOnAudio)
-    popOn.play()
-  }
 
   // Set Name
   const setPlayerName = (name: string) => {
@@ -95,8 +91,7 @@ const InputRoom = () => {
            shadow-lg shadow-drac_green/40
            hover:scale-125 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={onJoin}
-          onMouseEnter={playPopOn}
+          onClick={() => {onJoin(); SoundEffect();}}
         >
           <div className='m-auto'>join</div>
         </button>
@@ -106,7 +101,7 @@ const InputRoom = () => {
         <button
           className={`join-leave-button bg-drac_red 
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={onLeave}
+          onClick={() => {onLeave(); SoundEffect();}}
         >
           <div className='m-auto'>leave</div>
         </button>
