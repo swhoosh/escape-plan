@@ -34,6 +34,17 @@ const App = () => {
     showResult: false,
   })
 
+  const [sound, setSound] = useState(true)
+  const [soundText, setSoundText] = useState('mute')
+
+  const handleMuteButton = () => {
+    setSound(!sound)
+    if (sound) 
+      setSoundText('mute')
+    else
+      setSoundText('unmute')
+  }
+
   const [noticeText, setNoticeText] = useState('')
 
   const onLog = () => {
@@ -238,12 +249,20 @@ const App = () => {
         </div>
 
         <div className='fixed flex flex-col bottom-0'>
-          <button
-            className='m-auto py-1 px-3 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
-            onClick={onLog}
-          >
-            LOG gameData
-          </button>
+          <div className='flex flex-row px-8'>
+            <button
+              className='m-auto py-1 px-2 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
+              onClick={onLog}
+            >
+              LOG gameData
+            </button>
+            <button
+              className='m-auto py-1 px-2 rounded-full leading-tight bg-green-500 hover:bg-amber-600 font-bold'
+              onClick={handleMuteButton}
+            >
+              {soundText}
+            </button>
+          </div>
           <div className='text-center'>
             socket id : {gameData.socket.id} | Room : {gameData.roomID}
           </div>
