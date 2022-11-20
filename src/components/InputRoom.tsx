@@ -26,18 +26,22 @@ const InputRoom = () => {
     }
   }
 
+  const clickSingleplayer = (difficulty: string) => {
+    const easy = difficulty === 'easy' ? true : false
+    const hard = difficulty === 'hard' ? true : false
 
-  const clickSingleplayer = () => {
     if (name.trim().length !== 0 && roomID.trim().length !== 0) {
       setPlayerName(name)
-      gameData.socket.emit('join_singleplayer', roomID, name, gameData.options)
+      gameData.socket.emit('join_singleplayer', roomID, name, {
+        easy: easy,
+        hard: hard,
+      })
     } else {
       name.trim().length === 0
         ? setRoomStatus('ERROR : Enter Name')
         : setRoomStatus('ERROR : Enter Room Number')
     }
   }
-
 
   // Join Room
   const onJoin = () => {
@@ -121,18 +125,32 @@ const InputRoom = () => {
            shadow-lg shadow-drac_green/40
            hover:scale-120 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-            onClick={clickSingleplayer}
+            onClick={() => clickSingleplayer('easy')}
           >
-            <div className='m-auto'>vs AI</div>
+            <div className='m-auto'>easy</div>
           </button>
           <div className='hidden'>
-            <OptionsButton /> 
+            <OptionsButton />
           </div>
         </>
       )}
-      
 
-      
+      {!gameData.roomID && (
+        <>
+          <button
+            className={`join-leave-button  bg-drac_red
+           shadow-lg shadow-drac_red/40
+           hover:scale-120 hover:rounded-xl transition-all duration-100
+          ${gameData.roomID ? null : 'mt-3'} `}
+            onClick={() => clickSingleplayer('hard')}
+          >
+            <div className='m-auto'>hard</div>
+          </button>
+          <div className='hidden'>
+            <OptionsButton />
+          </div>
+        </>
+      )}
 
       {gameData.roomID && !gameData.playing ? (
         <button
