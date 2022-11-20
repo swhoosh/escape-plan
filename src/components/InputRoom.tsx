@@ -26,6 +26,19 @@ const InputRoom = () => {
     }
   }
 
+
+  const clickSingleplayer = () => {
+    if (name.trim().length !== 0 && roomID.trim().length !== 0) {
+      setPlayerName(name)
+      gameData.socket.emit('join_singleplayer', roomID, name, gameData.options)
+    } else {
+      name.trim().length === 0
+        ? setRoomStatus('ERROR : Enter Name')
+        : setRoomStatus('ERROR : Enter Room Number')
+    }
+  }
+
+
   // Join Room
   const onJoin = () => {
     if (name.trim().length !== 0 && roomID.trim().length !== 0) {
@@ -100,6 +113,26 @@ const InputRoom = () => {
           <OptionsButton />
         </>
       )}
+
+      {!gameData.roomID && (
+        <>
+          <button
+            className={`join-leave-button  bg-drac_darkgreen
+           shadow-lg shadow-drac_green/40
+           hover:scale-120 hover:rounded-xl transition-all duration-100
+          ${gameData.roomID ? null : 'mt-3'} `}
+            onClick={clickSingleplayer}
+          >
+            <div className='m-auto'>vs AI</div>
+          </button>
+          <div className='hidden'>
+            <OptionsButton /> 
+          </div>
+        </>
+      )}
+      
+
+      
 
       {gameData.roomID && !gameData.playing ? (
         <button

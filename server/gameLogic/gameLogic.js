@@ -19,7 +19,7 @@
 export const generateBoard = (grid_size) => {
   let board = createArray(grid_size)
   board = generateObstacle(board, grid_size)
-  board = generateTiles(board, 2, grid_size) // generate tunnel
+  // board = generateTiles(board, 2, grid_size) // generate tunnel
   return board
 }
 
