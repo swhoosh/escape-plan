@@ -51,7 +51,7 @@ const PlayerInfos = ({
                 {playerInfos[0].role}
               </div>
               {gameData.roomData.haveKey == playerInfos[0].role && <img
-            className={`absolute right-11 bottom-0 w-20 h-20 z-50 bg-white transition`}
+            className={`absolute right-11 bottom-0 w-20 h-20 z-50 transition`}
             style={{top:'150px',height:'60px'}}
             src='/key.png'
             alt=''
@@ -77,7 +77,7 @@ const PlayerInfos = ({
                 {playerInfos[1].role}
               </div>
               {gameData.roomData.haveKey == playerInfos[1].role && <img
-            className={`absolute right-11 w-20 h-20 z-50 bg-white transition`}
+            className={`absolute right-11 w-20 h-20 z-50 transition`}
             style={{top:'400px',height:'60px'}}
             src='/key.png'
             alt=''
