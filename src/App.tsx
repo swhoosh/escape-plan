@@ -1,9 +1,7 @@
 import { useState, createContext, useMemo, useEffect } from 'react'
-import io from 'socket.io-client'
 
 import Board from './components/Board'
 import InputRoom from './components/InputRoom'
-import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'

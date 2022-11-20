@@ -1,6 +1,3 @@
-import { useContext } from 'react'
-import { GameContext } from '../App'
-
 type BigNoticeProps = {
   text: string
 }

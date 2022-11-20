@@ -167,7 +167,7 @@ const Tile = ({
       >
         {activateTaunt ? (
           <img
-            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+            className={`absolute -right-20 w-20 h-20 z-50 transition ${
               transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
             }`}
             src='/taunt.png'
@@ -195,7 +195,7 @@ const Tile = ({
         {/* {validMove() && <span className='dot'></span>} */}
         {activateTaunt ? (
           <img
-            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+            className={`absolute -right-20 w-20 h-20 z-50 transition ${
               transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
             }`}
             src='/taunt.png'
