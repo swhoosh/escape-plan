@@ -36,7 +36,8 @@ const App = () => {
   })
 
   const [noticeText, setNoticeText] = useState('')
-
+  const template = document.getElementById('dialog-template');
+  
   const onLog = () => {
     console.log(gameData)
   }
@@ -124,10 +125,10 @@ const App = () => {
             myTurn: false,
             showResult: false,
           }))
-          setNoticeText('other player left')
+          setNoticeText('player has left the room ---waiting for new player to join room')
           setTimeout(() => {
             setNoticeText('')
-          }, 1500)
+          }, 15000)
         }
       }
     )
