@@ -91,7 +91,7 @@ const GameResult = ({ role }: { role: any }) => {
           </button>          
           }
 
-          {rematchRequest && <span className='text-center w-full p-1'>plz rematch with me.</span>}
+          {rematchRequest && <span className='text-center w-full p-1'>Opponent Requested Rematch</span>}
 
           <button
             className='result-button max-w-[100px] h-[30px] mt-3
