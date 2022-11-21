@@ -32,7 +32,7 @@ const InputRoom = () => {
 
     if (name.trim().length !== 0 && roomID.trim().length !== 0) {
       setPlayerName(name)
-      gameData.socket.emit('join_singleplayer', roomID, name, {
+      gameData.socket.emit('join_singleplayer', roomID, name,gameData.options, {
         easy: easy,
         hard: hard,
       })

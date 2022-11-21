@@ -19,6 +19,7 @@ import { chatLogic } from './chat.js'
 import { adminLogic } from './admin.js'
 import { tauntLogic } from './taunt.js'
 import { time } from 'console'
+import e from 'express'
 
 const app = express()
 const server = http.createServer(app)
@@ -39,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json())
 
 // where we store our data
-var t_pos 
+var t_pos
 const all_rooms = {}
 var timerIntervalId = []
 
@@ -90,9 +91,23 @@ const generateEmptyRoomData = (roomID) => {
     board: generateEmptyBoard(grid_size),
   }
 
+  all_rooms[roomID]['singleplayer'] = false
   all_rooms[roomID]['roomData'] = roomData
   return roomData
 }
+
+// const generateEmptyRoomDataSingleplayer = (roomID) => {
+//   let grid_size = 5
+
+//   // generate empty board just to show
+//   let roomData = {
+//     grid_size: grid_size,
+//     board: generateEmptyBoard(grid_size),
+//   }
+
+//   all_rooms[roomID]['roomData'] = roomData
+//   return roomData
+// }
 
 const generateShoes = (roomID) => {
   if (!all_rooms[roomID]['gameOptions'].shoes) return
@@ -134,11 +149,11 @@ const setStealthTime = (grid_size, stealthTime) => {
 }
 
 function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
+  const date = Date.now()
+  let currentDate = null
   do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
+    currentDate = Date.now()
+  } while (currentDate - date < milliseconds)
 }
 
 const generateNewRoomData = (roomID) => {
@@ -159,6 +174,7 @@ const generateNewRoomData = (roomID) => {
     prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
     warder_pos: w_pos,
     prisoner_pos: p_pos,
+    tunnel_pos: t_pos,
     warder_step: 1,
     prisoner_step: 1,
     shoesLeft: Math.floor(grid_size / 3),
@@ -166,6 +182,7 @@ const generateNewRoomData = (roomID) => {
     stealthTime: Math.floor((grid_size + 1) / 5) * 2,
     turn: 'warder',
   }
+  all_rooms[roomID]['singleplayer'] = false
   all_rooms[roomID]['roomData'] = roomData
 
   // special power
@@ -176,14 +193,14 @@ const generateNewRoomData = (roomID) => {
 }
 
 const generateNewRoomDataSingleplayer = (roomID) => {
-  const grid_size = all_rooms[roomID]['roomData'].grid_size
+  const grid_size = 10
   const board = generateBoard(grid_size) // generate board with obstacles
   const playerIndex = 1 // select player to be warder
   const w_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
   board[w_pos.y][w_pos.x] = 3 // place warder on board
   const p_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
   board[p_pos.y][p_pos.x] = 4 // place prisoner on board
-  t_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
+  const t_pos = generateEntityPos(board, grid_size) // get random pos {x, y}
   board[t_pos.y][t_pos.x] = 2 // place tunnel on board
 
   const roomData = {
@@ -193,23 +210,18 @@ const generateNewRoomDataSingleplayer = (roomID) => {
     prisoner: all_rooms[roomID]['playerInfos'][1 - playerIndex].socketID,
     warder_pos: w_pos,
     prisoner_pos: p_pos,
+    tunnel_pos: t_pos,
     warder_step: 1,
     prisoner_step: 1,
-    shoesLeft: Math.floor(grid_size / 3),
-    keysLeft: 1,
-    stealthTime: Math.floor((grid_size + 1) / 5) * 2,
     turn: 'warder',
   }
   all_rooms[roomID]['singleplayer'] = true
   all_rooms[roomID]['roomData'] = roomData
 
   // special power
-  generateShoes(roomID)
-  generateKeys(roomID)
 
   return roomData
 }
-
 
 const handleMove = (roomID, x, y) => {
   const roomData = all_rooms[roomID]['roomData']
@@ -279,7 +291,7 @@ const handleMove = (roomID, x, y) => {
       io.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
     }
     // prisoner move
-  } 
+  }
 
   io.to(roomID).emit(
     'update_playerInfo',
@@ -295,12 +307,52 @@ const handleMove = (roomID, x, y) => {
   // print_rooms()
 }
 
+const easyHeuristic = (roomID, x, y) => {
+  const roomData = all_rooms[roomID]['roomData']
+  const d1 = 1
+  const d2 = Math.sqrt(2)
 
+  const p_x = roomData.prisoner_pos.x
+  const p_y = roomData.prisoner_pos.y
+
+  console.log("EASY MOVING TOWARDS PRISONER")
+  return d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y))
+}
+
+const hardHeuristic = (roomID, x, y) => {
+  const roomData = all_rooms[roomID]['roomData']
+  const d1 = 1
+  const d2 = Math.sqrt(2)
+
+  const p_x = roomData.prisoner_pos.x
+  const p_y = roomData.prisoner_pos.y
+
+  const w_x = roomData.warder_pos.x
+  const w_y = roomData.warder_pos.y
+
+  const t_x = roomData.tunnel_pos.x
+  const t_y = roomData.tunnel_pos.y
+
+  const dx_wp = Math.abs(p_x - w_x)
+  const dy_wp = Math.abs(p_y - w_y)
+
+  const dx_wt = Math.abs(t_x - w_x)
+  const dy_wt = Math.abs(t_y - w_y)
+
+  if ((Math.sqrt(dx_wp*dx_wp + dy_wp*dy_wp)) >= (Math.sqrt(dx_wt*dx_wt + dy_wt*dy_wt))){
+    //console.log("HARD MOVING TOWARDS TUNNEL")
+    return (d1 * (Math.abs(x-t_x) + Math.abs(y-t_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-t_x), Math.abs(y-t_y)))+ (d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y)))
+  }else{
+    //console.log("HARD MOVING TOWARDS PRISONER")
+    return d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y)) 
+  }
+
+
+}
 
 const calculateWeight = (roomID, x, y) => {
   const roomData = all_rooms[roomID]['roomData']
   const p_pos = JSON.stringify(roomData.prisoner_pos)
-
 
   const p_x = p_pos.split(':')[1].split(',')[0]
   const p_y = p_pos.split(':')[2].split('')[0]
@@ -309,98 +361,70 @@ const calculateWeight = (roomID, x, y) => {
   const dx = Math.abs(x - p_x)
   const dy = Math.abs(y - p_y)
 
-  //According to https://www.geeksforgeeks.org/a-search-algorithm/ 
+  //According to https://www.geeksforgeeks.org/a-search-algorithm/
   const d1 = 1
   const d2 = Math.sqrt(2)
 
-  if ((roomData.board[y][x] === 1) || (roomData.board[y][x] === 2)) {
+  if (roomData.board[y][x] === 1 || roomData.board[y][x] === 2) {
     //console.log(x+"x"+y+" is increased by 10")
-    console.log("TILE "+ x+"x"+y+" IS VALUED " +roomData.board[y][x])
+    //console.log('TILE ' + x + 'x' + y + ' IS VALUED ' + roomData.board[y][x])
 
-    return ((d1*(dx+dy) + (d2 - 2 * d1) * Math.min(dx,dy))+10)
+    if (all_rooms[roomID]['difficulty']['hard']){
+      return hardHeuristic(roomID, x, y) + 10
+    }else{
+      return easyHeuristic(roomID, x, y) + 10
+    }
   }
 
-
   // console.log("TILE "+ x+"x"+y+" IS VALUED " +roomData.board[x][y])
-  return (d1*(dx+dy) + (d2 - 2 * d1) * Math.min(dx,dy))
-
+  //console.log(all_rooms[roomID]['difficulty']['hard'])
+  if (all_rooms[roomID]['difficulty']['hard']){
+    return hardHeuristic(roomID, x, y)
+  }else{
+    return easyHeuristic(roomID, x, y)
+  }
 }
 // Y FIRST THEN X
 //FIND THE 8 ADJACENT TILES OF A GIVEN TILE
-const findNeighbors = (roomID, x, y) => { 
+const findNeighbors = (roomID, x, y) => {
   const roomData = all_rooms[roomID]['roomData']
-  console.log("THIS BOARD IS SIZED " + roomData.grid_size)
+  //console.log('THIS BOARD IS SIZED ' + roomData.grid_size)
   const neighbors = []
   // print_rooms()
-  console.log(roomData.board[2][3])
+  //console.log(roomData.board[2][3])
 
-  if (x < roomData.grid_size - 1){
-    neighbors.push(`${Number(x)+1}x${Number(y)}`) //RIGHT
-    // if ((roomData.board[x+1][y] === "1") || (roomData.board[x+1][y] === "2")){
-    //   neighbors.remove(`${Number(x)+1}x${Number(y)}`)
-    // }
-    if (y > 0){
-      neighbors.push(`${Number(x)+1}x${Number(y)-1}`) //RIGHT UP
-      // if ((roomData.board[x+1][y-1] === "1") || (roomData.board[x+1][y-1] === "2")){
-      //   neighbors.remove(`${Number(x)+1}x${Number(y)-1}`)
-      // }
+  if (x < roomData.grid_size - 1) {
+    neighbors.push(`${Number(x) + 1}x${Number(y)}`) //RIGHT
+    if (y > 0) {
+      neighbors.push(`${Number(x) + 1}x${Number(y) - 1}`) //RIGHT UP
     }
   }
 
-  if (x > 0){
-    neighbors.push(`${Number(x)-1}x${Number(y)}`) //LEFT
-    // if ((roomData.board[x-1][y] === "1") || (roomData.board[x-1][y] === "2")){
-    //   neighbors.remove(`${Number(x)-1}x${Number(y)}`)
-    // }
-    if (y < roomData.grid_size - 1){
-      neighbors.push(`${Number(x)-1}x${Number(y)+1}`) //LEFT UP
-      // if ((roomData.board[x-1][y+1] === "1") || (roomData.board[x-1][y+1] === "2")){
-      //   neighbors.remove(`${Number(x)-1}x${Number(y)+1}`)
-      // }
+  if (x > 0) {
+    neighbors.push(`${Number(x) - 1}x${Number(y)}`) //LEFT
+    if (y < roomData.grid_size - 1) {
+      neighbors.push(`${Number(x) - 1}x${Number(y) + 1}`) //LEFT UP
     }
   }
 
-  if (y < roomData.grid_size - 1){
-    neighbors.push(`${Number(x)}x${Number(y)+1}`) //DOWN
-    // if ((roomData.board[x][y+1] === "1") || (roomData.board[x][y+1] === "2")){
-    //   neighbors.remove(`${Number(x)}x${Number(y+1)}`)
-    // }
-    if (x < roomData.grid_size - 1){
-      neighbors.push(`${Number(x)+1}x${Number(y)+1}`) //RIGHT DOWN
-      // if ((roomData.board[x+1][y+1] === "1") || (roomData.board[x+1][y+1] === "2")){
-      //   neighbors.remove(`${Number(x)+1}x${Number(y)+1}`)
-      // }
+  if (y < roomData.grid_size - 1) {
+    neighbors.push(`${Number(x)}x${Number(y) + 1}`) //DOWN
+    if (x < roomData.grid_size - 1) {
+      neighbors.push(`${Number(x) + 1}x${Number(y) + 1}`) //RIGHT DOWN
     }
   }
 
-  if (y > 0){
-    neighbors.push(`${Number(x)}x${Number(y)-1}`) //UP
-    // if ((roomData.board[x][y-1] === "1") || (roomData.board[x][y-1] === "2")){
-    //   neighbors.remove(`${Number(x)}x${Number(y)-1}`)
-    // }
-    if (x > 0){
-      neighbors.push(`${Number(x)-1}x${Number(y)-1}`) //UP LEFT
-      // if ((roomData.board[x-1][y-1] === "1") || (roomData.board[x-1][y-1] === "2")){
-      //   neighbors.remove(`${Number(x)-1}x${Number(y)-1}`)
-      // }
+  if (y > 0) {
+    neighbors.push(`${Number(x)}x${Number(y) - 1}`) //UP
+    if (x > 0) {
+      neighbors.push(`${Number(x) - 1}x${Number(y) - 1}`) //UP LEFT
     }
   }
-  
-  // neighbors.push(`${Number(x)-1}x${Number(y)-1}`)
-  // neighbors.push(`${Number(x)-1}x${Number(y)}`)
-  // neighbors.push(`${Number(x)-1}x${Number(y)+1}`)
-  // neighbors.push(`${Number(x)}x${Number(y)-1}`)
-  // neighbors.push(`${Number(x)}x${Number(y)+1}`)
-  // neighbors.push(`${Number(x)+1}x${Number(y)-1}`)
-  // neighbors.push(`${Number(x)+1}x${Number(y)}`)
-  // neighbors.push(`${Number(x)+1}x${Number(y)+1}`)
-  print_rooms()
+
+  //print_rooms()
+  // console.log("PRISONER X IS "+roomData.prisoner_pos.x)
   return neighbors
 }
-
-
-
-
 
 const botMove = (roomID) => {
   const roomData = all_rooms[roomID]['roomData']
@@ -408,19 +432,22 @@ const botMove = (roomID) => {
   const bot_pos = JSON.stringify(roomData.warder_pos)
   const b_x = bot_pos.split(':')[1].split(',')[0]
   const b_y = bot_pos.split(':')[2].split('')[0]
-  const neighbors = findNeighbors(roomID,b_x,b_y)
+  const neighbors = findNeighbors(roomID, b_x, b_y)
   //console.log(`${x}x${y}`)
 
   var temp_cost
   var min_cost = 999999
-  var best_move = ""
+  var best_move = ''
 
-
-  for (const e of neighbors){
+  for (const e of neighbors) {
     // console.log(e)
-    temp_cost = calculateWeight(roomID, parseInt(e.substring(0, e.indexOf("x"))),parseInt(e.substring(e.indexOf("x") + 1)))
-    console.log("TILE " + e + " has cost of " + temp_cost)
-    if (temp_cost <= min_cost){
+    temp_cost = calculateWeight(
+      roomID,
+      parseInt(e.substring(0, e.indexOf('x'))),
+      parseInt(e.substring(e.indexOf('x') + 1))
+    )
+    //console.log('TILE ' + e + ' has cost of ' + temp_cost)
+    if (temp_cost <= min_cost) {
       min_cost = temp_cost
       best_move = e
     }
@@ -429,51 +456,15 @@ const botMove = (roomID) => {
   }
   //console.log(neighbors)
   //console.log("x is "+ x + " y is " + y)
-  console.log("best move is " + best_move)
+  console.log('best move is ' + best_move)
 
-  const move_to_x = parseInt(best_move.substring(0, best_move.indexOf("x")))
-  const move_to_y = parseInt(best_move.substring(best_move.indexOf("x") + 1))
+  const move_to_x = parseInt(best_move.substring(0, best_move.indexOf('x')))
+  const move_to_y = parseInt(best_move.substring(best_move.indexOf('x') + 1))
   //console.log(t_pos)
   // io.gameData.socket.emit('clicked_tile', gameData.roomID, j, i
 
-  handleMove(roomID,move_to_x,move_to_y)
-
-
-  // const role = roomData.warder === 0 ? 'warder' : 'prisoner'
-  // const enemy_role = roomData.warder !== 0 ? 'warder' : 'prisoner'
-  // if (roomData.turn !== role) return //not my turn
-  // roomData.turn = 'none'
-
-
-  // const old_pos = roomData.warder_pos
-  // //sleep(2000)
-
-  // all_rooms[roomID]['roomData'].board[move_to_y][move_to_x] = 3 // move warder in board
-  // if (old_pos.y === move_to_y && old_pos.x === move_to_x);
-  // else all_rooms[roomID]['roomData'].board[old_pos.y][old_pos.x] = 0 // set board's old position to 0
-
-  // all_rooms[roomID]['roomData']['warder_pos'] = { x: move_to_x, y: move_to_y }
-  // all_rooms[roomID]['roomData']['turn'] = 'prisoner'
-
-  // timerIntervalId[roomID] = gameTimer(
-  //   io,
-  //   roomID,
-  //   timerIntervalId[roomID],
-  //   skipTurn,
-  //   all_rooms[roomID]['gameOptions']
-  // )
-  // io.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
-  // io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
-
-
-  // console.log("BOT MOVE FUNCTION IS CALLED HERE")
-  // console.log(roomData.warder_pos)
-  // print_rooms()
-
-
+  handleMove(roomID, move_to_x, move_to_y)
 }
-
-
 
 const skipTurn = (roomID) => {
   const roomData = all_rooms[roomID]['roomData']
@@ -489,13 +480,15 @@ const skipTurn = (roomID) => {
     skipTurn,
     all_rooms[roomID]['gameOptions']
   )
-  if(all_rooms[roomID]['singleplayer']){
+  if (all_rooms[roomID]['singleplayer']) {
     botMove(roomID)
   }
 }
 
 const handle_leave_room = (roomID, socketID) => {
   // if there is no roomID in all_rooms do nothing
+  const isSingleplayer = all_rooms[roomID].singleplayer
+
   if (!(roomID in all_rooms)) return
 
   let roomData = generateEmptyRoomData(roomID)
@@ -508,13 +501,18 @@ const handle_leave_room = (roomID, socketID) => {
     roomData
   )
 
-  if(all_rooms[roomID]['singleplayer'] !== undefined){
-    delete all_rooms[roomID]
+  if (roomID in all_rooms) {
+    if (isSingleplayer) {
+      console.log('bot dead')
+      delete all_rooms[roomID]
+    }
   }
+
   print_rooms()
 }
 
 const startRoom = (roomID) => {
+  
   let roomData = generateNewRoomData(roomID)
 
   io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
@@ -544,11 +542,11 @@ const resetRoom = (roomID) => {
 const reMatch = (roomID) => {
   if (!(roomID in all_rooms)) return
   if (n_sockets_in_room(roomID) !== 2) return
-  startRoom(roomID)
   io.to(roomID).emit('update_showResult', false)
   return
 }
 
+// **********************************MULTIPLAYER *****************************************************
 // ON CLIENT CONNECTION
 io.on('connection', (socket) => {
   // console.log(`${socket.id} : ${io.engine.clientsCount - 1}`)
@@ -622,87 +620,111 @@ io.on('connection', (socket) => {
     print_rooms()
   })
 
-  socket.on('join_singleplayer', async (roomID, playerName, options) => {
+  // **********************************SINGLEPLAYER *****************************************************
 
-    if (n_sockets_in_room(roomID) >= 1) {
-      socket.emit('room_full')
-      return
+  socket.on(
+    'join_singleplayer',
+    async (roomID, playerName, options, difficulty) => {
+      console.log('difficulty easy is ' + difficulty['easy'])
+      console.log('difficulty hard is ' + difficulty['hard'])
+
+      if (n_sockets_in_room(roomID) >= 1) {
+        socket.emit('room_full')
+        return
+      }
+
+      // can join
+      socket.join(roomID)
+      socket.emit('set_roomID') // set gameData.roomID
+
+      const newPlayerInfo = {
+        name: playerName,
+        socketID: socket.id,
+        score: 0,
+        priority: 0,
+        reMatch: false,
+      }
+
+      if (difficulty['easy']) {
+        var botInfo = {
+          name: 'NoobBot',
+          socketID: 0,
+          score: 0,
+          priority: 0,
+          reMatch: true,
+        }
+      } else {
+        var botInfo = {
+          name: 'DoomBot',
+          socketID: 0,
+          score: 0,
+          priority: 0,
+          reMatch: true,
+        }
+      }
+      // const botInfo = {
+      //   name: "WishBot",
+      //   socketID: 0,
+      //   score: 0,
+      //   priority: 0,
+      //   reMatch: false,
+      // }
+
+      // create room when no room. if already has a player in room, push new player
+      if (!(roomID in all_rooms)) {
+        all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
+        all_rooms[roomID]['gameOptions'] = options
+        all_rooms[roomID]['difficulty'] = difficulty
+      } else {
+        socket.emit('room_full')
+      }
+
+      // console.log("difficulty is " + JSON.stringify(difficulty))
+
+      //console.log("difficulty is " +all_rooms[roomID]['difficulty']['easy'])
+
+      all_rooms[roomID]['playerInfos'].push(botInfo)
+
+      // generate empty board just to show to player waiting in the room
+      let roomData = generateEmptyRoomData(roomID)
+      io.to(roomID).emit('update_roomData', roomData) // send empty board
+
+      // 2 players in room already, start the game
+      if (n_sockets_in_room(roomID) === 2) {
+        updateGameOptions(roomID)
+        //all_rooms[roomID]['playerInfos'][playerIndex].socketID = 0
+
+        roomData = generateNewRoomDataSingleplayer(roomID)
+
+        io.to(roomID).emit(
+          'game_start',
+          roomData,
+          all_rooms[roomID]['playerInfos']
+        )
+
+        timerIntervalId[roomID] = gameTimer(
+          io,
+          roomID,
+          timerIntervalId[roomID],
+          skipTurn,
+          all_rooms[roomID]['gameOptions']
+        )
+      } else {
+        io.to(roomID).emit(
+          'update_playerInfo',
+          all_rooms[roomID]['playerInfos'],
+          true
+        )
+        io.to(roomID).emit('update_showBoard', true)
+      }
+
+      botMove(roomID)
+
+      //console.log("warder socket is " + roomData.warder)
+      //print_rooms()
+      console.log('---------------------------------------------')
     }
-
-    // can join
-    socket.join(roomID)
-    socket.emit('set_roomID') // set gameData.roomID
-
-    const newPlayerInfo = {
-      name: playerName,
-      socketID: socket.id,
-      score: 0,
-      priority: 0,
-      reMatch: false,
-    }
-
-    const botInfo = {
-      name: "WishBot",
-      socketID: 0,
-      score: 0,
-      priority: 0,
-      reMatch: false,
-    } 
-
-    // create room when no room. if already has a player in room, push new player
-    if (!(roomID in all_rooms)) {
-      all_rooms[roomID] = { playerInfos: [newPlayerInfo] }
-      all_rooms[roomID]['gameOptions'] = options
-    } else {
-      socket.emit('room_full')
-    }
-
-    all_rooms[roomID]['playerInfos'].push(botInfo)
-
-    // generate empty board just to show to player waiting in the room
-    let roomData = generateEmptyRoomData(roomID)
-    io.to(roomID).emit('update_roomData', roomData) // send empty board
-
-    // 2 players in room already, start the game
-    if (n_sockets_in_room(roomID) === 2) {
-      updateGameOptions(roomID)
-      //all_rooms[roomID]['playerInfos'][playerIndex].socketID = 0
-
-      roomData = generateNewRoomDataSingleplayer(roomID)
-
-      io.to(roomID).emit(
-        'game_start',
-        roomData,
-        all_rooms[roomID]['playerInfos']
-      )
-
-      timerIntervalId[roomID] = gameTimer(
-        io,
-        roomID,
-        timerIntervalId[roomID],
-        skipTurn,
-        all_rooms[roomID]['gameOptions']
-      )
-
-    }
-
-    else {
-      io.to(roomID).emit(
-        'update_playerInfo',
-        all_rooms[roomID]['playerInfos'],
-        true
-      )
-      io.to(roomID).emit('update_showBoard', true)
-    }
-
-    botMove(roomID)
-
-    //console.log("warder socket is " + roomData.warder)
-    //print_rooms()
-    console.log("---------------------------------------------")
-  })
-
-
+  )
 
   // ON LEAVE ROOM
   socket.on('leave_room', (roomID) => {
@@ -828,9 +850,10 @@ io.on('connection', (socket) => {
           all_rooms[roomID]['gameOptions']
         )
 
-        if (all_rooms[roomID]['singleplayer']){
+        if (all_rooms[roomID]['singleplayer']) {
+          //sleep(1000)
           botMove(roomID)
-        }else{
+        } else {
           socket.to(roomData[enemy_role]).emit('your_turn') // tell other socket it's ur turn
         }
       }
@@ -842,7 +865,7 @@ io.on('connection', (socket) => {
       true
     )
     io.to(roomID).emit('update_roomData', all_rooms[roomID]['roomData'])
-    print_rooms()
+    //print_rooms()
   })
 
   socket.on('rematch', (roomID) => {
