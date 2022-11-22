@@ -9,6 +9,7 @@ import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'
 import { socketMain } from './service/socket'
 import BigNotice from './components/BigNotice'
+import { PopUp } from './sounds/SoundEffect'
 
 export const GameContext = createContext<any>({})
 
@@ -34,7 +35,7 @@ const App = () => {
     showResult: false,
   })
 
-  const [sound, setSound] = useState(true)
+  const [sound, setSound] = useState(false)
   const [soundText, setSoundText] = useState('mute')
 
   const handleMuteButton = () => {
@@ -219,13 +220,13 @@ const App = () => {
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+          <GameResult sound={sound} playerInfos={gameData.playerInfos} role={gameData.role} />
         ) : null}
 
         <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center'>
           <div className=''>
             <div className='text-[5vh] text-center'>Escape Plan</div>
-            <InputRoom />
+            <InputRoom sound={sound}/>
           </div>
 
           <div className='relative grid grid-cols-4 gap-2'>
@@ -239,12 +240,12 @@ const App = () => {
             ) : null}
 
             <div className='col-span-2'>
-              {gameData.showBoard ? <Board /> : null}
+              {gameData.showBoard ? <Board sound={sound}/> : null}
               {/* {gameData.playing && <GameTimer />} */}
               {/* {gameData.playing ? <GameTurn /> : null} */}
             </div>
 
-            {gameData.showBoard ? <ChatBox chatScope='global' /> : null}
+            {gameData.showBoard ? <ChatBox sound={sound} chatScope='global' /> : null}
           </div>
         </div>
 
@@ -252,12 +253,13 @@ const App = () => {
           <div className='flex flex-row px-8'>
             <button
               className='m-auto py-1 px-2 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
-              onClick={onLog}
+              onClick={() => {onLog(); PopUp(sound);}}
             >
               LOG gameData
             </button>
             <button
-              className='m-auto py-1 px-2 rounded-full leading-tight bg-green-500 hover:bg-amber-600 font-bold'
+              className={sound ? 'm-auto py-1 px-2 rounded-full leading-tight bg-green-500 hover:bg-amber-600 font-bold' : 
+              'm-auto py-1 px-2 rounded-full leading-tight bg-red-500 hover:bg-amber-600 font-bold'}
               onClick={handleMuteButton}
             >
               {soundText}

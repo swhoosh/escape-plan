@@ -1,8 +1,9 @@
 import { RiVipCrownFill } from 'react-icons/ri'
 import { useContext, useEffect, useState } from 'react'
 import { GameContext } from '../App'
-
-const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
+import { PopUpBub } from '../sounds/SoundEffect'
+ 
+const GameResult = ({ playerInfos, role, sound }: { playerInfos: any; role: any, sound: boolean }) => {
   const { gameData, setGameData } = useContext(GameContext)
   const [ rematchRequest, setRematchRequest ] = useState(false)
   const [ rematchColA,setRematchColA ] = useState("drac_darkgreen")
@@ -21,6 +22,7 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
     // console.log(`[CLIENT] leaveRoom : ${gameData.roomID}`)
     setGameData({ ...gameData, roomID: '' })
     gameData.socket.emit('leave_room', gameData.roomID)
+    PopUpBub(sound)
   }
 
   const onReMatch = () => {
@@ -28,6 +30,7 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
     // setRematchColA("drac_black")
     // setRematchColB("drac_darkgrey")
     setMeRequester(true)
+    PopUpBub(sound)
   }
 
   useEffect(()=> {
