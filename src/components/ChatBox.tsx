@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { GameContext } from '../App'
 import { socketChat } from '../service/socket'
 import TauntButton from './TauntButton'
+import { Drum } from '../sounds/SoundEffect'
 
 type ChatBoxProps = {
   chatScope: string
@@ -180,7 +181,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
 
       <button
         className='chat-button max-w-[60px] rounded-xl bg-drac_pink'
-        onClick={sendMessage}
+        onClick={() => {sendMessage(); Drum();}}
       >
         <div className='m-auto text-[2vh]'>send</div>
       </button>

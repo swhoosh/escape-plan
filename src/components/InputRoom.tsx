@@ -2,6 +2,8 @@ import { useState, useContext } from 'react'
 import { GameContext } from '../App'
 import OptionsButton from './OptionsButton'
 
+import { Bubble, PopUp } from '../sounds/SoundEffect'
+
 const InputRoom = () => {
   const { gameData, setGameData } = useContext(GameContext)
   const [name, setName] = useState('')
@@ -110,7 +112,7 @@ const InputRoom = () => {
            shadow-lg shadow-drac_green/40
            hover:scale-120 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-            onClick={onJoin}
+            onClick={() => {onJoin(); Bubble();}}
           >
             <div className='m-auto'>join</div>
           </button>
@@ -156,7 +158,7 @@ const InputRoom = () => {
         <button
           className={`join-leave-button bg-drac_red 
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={onLeave}
+          onClick={() => {onLeave(); PopUp();}}
         >
           <div className='m-auto'>leave</div>
         </button>
