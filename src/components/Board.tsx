@@ -20,6 +20,7 @@ const Board = () => {
       return () => gameData.socket.off('taunt_display')
     }
   }, [gameData])
+
   React.useEffect(() => {
     if (showTaunt !== '') {
       setTimeout(() => setShowTaunt(''), 1000)
@@ -214,7 +215,7 @@ const Tile = ({
       ></button>
     )
 
-    if (tileValue === 6)
+  if (tileValue === 6)
     return (
       <button
         className='tile bg-drac_yellow group'

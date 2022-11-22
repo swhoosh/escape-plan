@@ -38,15 +38,13 @@ const App = () => {
 
   const handleMuteButton = () => {
     setSound(!sound)
-    if (sound) 
-      setSoundText('mute')
-    else
-      setSoundText('unmute')
+    if (sound) setSoundText('mute')
+    else setSoundText('unmute')
   }
 
   const [noticeText, setNoticeText] = useState('')
-  const template = document.getElementById('dialog-template');
-  
+  const template = document.getElementById('dialog-template')
+
   const onLog = () => {
     console.log(gameData)
   }
@@ -134,10 +132,12 @@ const App = () => {
             myTurn: false,
             showResult: false,
           }))
-          setNoticeText('player has left the room ---waiting for new player to join room')
+          setNoticeText(
+            'player has left the room ---waiting for new player to join room'
+          )
           setTimeout(() => {
             setNoticeText('')
-          }, 15000)
+          }, 2000)
         }
       }
     )
@@ -227,9 +227,7 @@ const App = () => {
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
         {/* Result Screen */}
-        {gameData.showResult ? (
-          <GameResult role={gameData.role} />
-        ) : null}
+        {gameData.showResult ? <GameResult role={gameData.role} /> : null}
 
         {/* Main container */}
         <div className='relative flex grow flex-col max-w-[1024px] justify-center'>

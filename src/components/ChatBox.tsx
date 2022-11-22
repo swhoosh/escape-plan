@@ -157,6 +157,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
 
   const onKeyPress = (event: any) => {
     if (event.key === 'Enter') {
+      Drum()
       sendMessage()
     }
   }
@@ -181,7 +182,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
 
       <button
         className='chat-button max-w-[60px] rounded-xl bg-drac_pink'
-        onClick={() => {sendMessage(); Drum();}}
+        onClick={() => {
+          sendMessage()
+          Drum()
+        }}
       >
         <div className='m-auto text-[2vh]'>send</div>
       </button>

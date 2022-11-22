@@ -315,8 +315,11 @@ const easyHeuristic = (roomID, x, y) => {
   const p_x = roomData.prisoner_pos.x
   const p_y = roomData.prisoner_pos.y
 
-  console.log("EASY MOVING TOWARDS PRISONER")
-  return d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y))
+  console.log('EASY MOVING TOWARDS PRISONER')
+  return (
+    d1 * (Math.abs(x - p_x) + Math.abs(y - p_y)) +
+    (d2 - 2 * d1) * Math.min(Math.abs(x - p_x), Math.abs(y - p_y))
+  )
 }
 
 const hardHeuristic = (roomID, x, y) => {
@@ -339,15 +342,24 @@ const hardHeuristic = (roomID, x, y) => {
   const dx_wt = Math.abs(t_x - w_x)
   const dy_wt = Math.abs(t_y - w_y)
 
-  if ((Math.sqrt(dx_wp*dx_wp + dy_wp*dy_wp)) >= (Math.sqrt(dx_wt*dx_wt + dy_wt*dy_wt))){
+  if (
+    Math.sqrt(dx_wp * dx_wp + dy_wp * dy_wp) >=
+    Math.sqrt(dx_wt * dx_wt + dy_wt * dy_wt)
+  ) {
     //console.log("HARD MOVING TOWARDS TUNNEL")
-    return (d1 * (Math.abs(x-t_x) + Math.abs(y-t_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-t_x), Math.abs(y-t_y)))+ (d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y)))
-  }else{
+    return (
+      d1 * (Math.abs(x - t_x) + Math.abs(y - t_y)) +
+      (d2 - 2 * d1) * Math.min(Math.abs(x - t_x), Math.abs(y - t_y)) +
+      (d1 * (Math.abs(x - p_x) + Math.abs(y - p_y)) +
+        (d2 - 2 * d1) * Math.min(Math.abs(x - p_x), Math.abs(y - p_y)))
+    )
+  } else {
     //console.log("HARD MOVING TOWARDS PRISONER")
-    return d1 * (Math.abs(x-p_x) + Math.abs(y-p_y)) + (d2 - 2 * d1) * Math.min(Math.abs(x-p_x), Math.abs(y-p_y)) 
+    return (
+      d1 * (Math.abs(x - p_x) + Math.abs(y - p_y)) +
+      (d2 - 2 * d1) * Math.min(Math.abs(x - p_x), Math.abs(y - p_y))
+    )
   }
-
-
 }
 
 const calculateWeight = (roomID, x, y) => {
@@ -369,18 +381,18 @@ const calculateWeight = (roomID, x, y) => {
     //console.log(x+"x"+y+" is increased by 10")
     //console.log('TILE ' + x + 'x' + y + ' IS VALUED ' + roomData.board[y][x])
 
-    if (all_rooms[roomID]['difficulty']['hard']){
+    if (all_rooms[roomID]['difficulty']['hard']) {
       return hardHeuristic(roomID, x, y) + 10
-    }else{
+    } else {
       return easyHeuristic(roomID, x, y) + 10
     }
   }
 
   // console.log("TILE "+ x+"x"+y+" IS VALUED " +roomData.board[x][y])
   //console.log(all_rooms[roomID]['difficulty']['hard'])
-  if (all_rooms[roomID]['difficulty']['hard']){
+  if (all_rooms[roomID]['difficulty']['hard']) {
     return hardHeuristic(roomID, x, y)
-  }else{
+  } else {
     return easyHeuristic(roomID, x, y)
   }
 }
@@ -512,7 +524,6 @@ const handle_leave_room = (roomID, socketID) => {
 }
 
 const startRoom = (roomID) => {
-  
   let roomData = generateNewRoomData(roomID)
 
   io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
