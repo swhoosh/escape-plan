@@ -1,5 +1,42 @@
+import { readFileSync } from 'fs';
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+
 export const chatLogic = (io) => {
   var chatRooms = {}
+
+  var badWords = []
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
+  
+  var content = readFileSync(path.join(__dirname,'public/profanity.txt'), 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    // console.log(data);
+    badWords = data.split('\r\n')
+    // console.log(badWords)
+  });
+  badWords = content.split('\r\n')
+  const reEscape = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  var badWordsRE = new RegExp(badWords.map(reEscape).join('|'));
+
+  
+
+  
+  const censorProfanity = (message) => {
+    var profanity = message.match(badWordsRE)
+    while (profanity) {
+      // console.log(profanity) 
+      message = message.replace(badWordsRE, new Array(profanity[0].length + 1).join( '*' ))
+      profanity = message.match(badWordsRE)
+    }
+    return message
+    // console.log(message)
+  }
+
 
   io.of('/chat').on('connection', (socket) => {
     // console.log(socket.id + ' connected to /chat')
@@ -39,7 +76,7 @@ export const chatLogic = (io) => {
         io.of('/chat').sockets.adapter.rooms.get(scope).size === 0
       )
         delete chatRooms[scope]
-      console.log(socket.id + ' left /chat ' + scope)
+      // console.log(socket.id + ' left /chat ' + scope)
     })
 
     socket.on('disconnect', () => {
@@ -63,6 +100,9 @@ export const chatLogic = (io) => {
 
     socket.on('send message', (message, scope) => {
       if (socket.rooms.has(scope)) {
+        //replace profanity
+        message = censorProfanity(message)
+
         //check if joined room
         const messageData = {
           message: message,
@@ -72,7 +112,7 @@ export const chatLogic = (io) => {
         }
         io.of('/chat').to(scope).emit('append chat', messageData, scope)
         chatRooms[scope].chatRoomData.push(messageData)
-        console.log('recieved message : ' + message)
+        // console.log('recieved message : ' + message)
       }
     })
 

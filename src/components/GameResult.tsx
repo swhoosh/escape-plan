@@ -2,19 +2,25 @@ import { RiVipCrownFill } from 'react-icons/ri'
 import { useContext, useEffect, useState } from 'react'
 import { GameContext } from '../App'
 
-const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
+const GameResult = ({ role }: { role: any }) => {
   const { gameData, setGameData } = useContext(GameContext)
   const [ rematchRequest, setRematchRequest ] = useState(false)
-  const [ rematchColA,setRematchColA ] = useState("drac_darkgreen")
+  const [ rematchColA,setRematchColA ] = useState("drac_darkgreen") //can't dynamicly change classname to change col gotta use style
   const [ rematchColB,setRematchColB ] = useState("bg-drac_green")
   const [ meRequester,setMeRequester ] = useState(false)
 
-  if (gameData.showResult) {
-    playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
-    playerInfos[0]['role'] = role
-    if (playerInfos.length > 1) {
-      playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
-    }
+  // if (gameData.showResult) {
+  //   playerInfos = playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  //   playerInfos[0]['role'] = role
+  //   if (playerInfos.length > 1) {
+  //     playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
+  //   }
+  // }
+
+  var playerInfos = gameData.playerInfos.sort((a: any, b: any) => b.priority - a.priority)
+  playerInfos[0]['role'] = role
+  if (playerInfos.length > 1) {
+    playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
   }
 
   const onLeave = () => {
@@ -48,7 +54,8 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
        m-auto p-10 w-1/2 max-w-[700px] h-[60%] max-h-[720px] justify-evenly
        bg-drac_black rounded-xl z-50 border'
       >
-        <div className='text-7xl text-center'>Victory</div>
+        {gameData.result === 'win' && <div className='text-7xl text-center'>VICTORY</div>}
+        {gameData.result !== 'win' && <div className='text-7xl text-center'>DEFEAT</div>}
         <div className='grid grid-cols-2 gap-20'>
           {playerInfos.map((playerInfo: any) => {
             return (
@@ -84,7 +91,7 @@ const GameResult = ({ playerInfos, role }: { playerInfos: any; role: any }) => {
           </button>          
           }
 
-          {rematchRequest && <span className='text-center w-full p-1'>plz rematch with me.</span>}
+          {rematchRequest && <span className='text-center w-full p-1'>Opponent Requested Rematch</span>}
 
           <button
             className='result-button max-w-[100px] h-[30px] mt-3

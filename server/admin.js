@@ -1,9 +1,10 @@
 export const adminLogic = (app,io,ADMINPORT,resetRoom) => {
+  const HOST = 'localhost'
   app.get('/', (req, res) => {
       res.render('index', { title: 'Escape Plan Admin' })
   })
     
-  app.listen(ADMINPORT, () => {
+  app.listen(ADMINPORT,HOST, () => {
     console.log(`[ADMIN SERVER] listening on port ${ADMINPORT}`)
   })
 

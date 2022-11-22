@@ -1,9 +1,7 @@
 import { useState, createContext, useMemo, useEffect } from 'react'
-import io from 'socket.io-client'
 
 import Board from './components/Board'
 import InputRoom from './components/InputRoom'
-import GameTurn from './components/GameTurn'
 import ChatBox from './components/ChatBox'
 import GameResult from './components/GameResult'
 import PlayerInfos from './components/PlayerInfos'
@@ -32,6 +30,7 @@ const App = () => {
     showPlayerInfos: false,
     playerInfos: {},
     showResult: false,
+    result: '',
   })
 
   const [sound, setSound] = useState(true)
@@ -46,7 +45,8 @@ const App = () => {
   }
 
   const [noticeText, setNoticeText] = useState('')
-
+  const template = document.getElementById('dialog-template');
+  
   const onLog = () => {
     console.log(gameData)
   }
@@ -75,6 +75,7 @@ const App = () => {
         playerInfos: playerInfos,
         showPlayerInfos: showPlayerInfos,
       }))
+      // console.log(playerInfos)
     })
 
     gameData.socket.on('game_start', (roomData, playerInfos) => {
@@ -133,10 +134,10 @@ const App = () => {
             myTurn: false,
             showResult: false,
           }))
-          setNoticeText('other player left')
+          setNoticeText('player has left the room ---waiting for new player to join room')
           setTimeout(() => {
             setNoticeText('')
-          }, 1500)
+          }, 15000)
         }
       }
     )
@@ -155,17 +156,17 @@ const App = () => {
       }))
     })
 
-    gameData.socket.on('update_playing', (playing) => {
-      setGameData((prevGameData) => ({
-        ...prevGameData,
-        playing: playing,
-      }))
-    })
-
     gameData.socket.on('update_showResult', (showResult) => {
       setGameData((prevGameData) => ({
         ...prevGameData,
         showResult: showResult,
+      }))
+    })
+
+    gameData.socket.on('update_gameOptions', (options) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        options: options,
       }))
     })
 
@@ -191,7 +192,7 @@ const App = () => {
         ...prevGameData,
         myTurn: true,
       }))
-      console.log('my turn')
+      // console.log('my turn')
     })
 
     gameData.socket.on('skip_turn', () => {
@@ -199,7 +200,14 @@ const App = () => {
         ...prevGameData,
         myTurn: false,
       }))
-      console.log('skip turn')
+      // console.log('skip turn')
+    })
+
+    gameData.socket.on('result', (result) => {
+      setGameData((prevGameData) => ({
+        ...prevGameData,
+        result: result,
+      }))
     })
 
     return () => {
@@ -218,17 +226,22 @@ const App = () => {
     // Provide GameContext for the whole app
     <GameContext.Provider value={{ gameData, setGameData }}>
       <div className='flex overflow-hidden w-full h-screen bg-drac_black text-drac_white justify-center items-center font-comfy'>
+        {/* Result Screen */}
         {gameData.showResult ? (
-          <GameResult playerInfos={gameData.playerInfos} role={gameData.role} />
+          <GameResult role={gameData.role} />
         ) : null}
 
-        <div className='relative flex grow flex-col min-w-[320px] max-w-[1024px] justify-center'>
-          <div className=''>
+        {/* Main container */}
+        <div className='relative flex grow flex-col max-w-[1024px] justify-center'>
+          {/* Game title + inputRoom */}
+          <>
             <div className='text-[5vh] text-center'>Escape Plan</div>
             <InputRoom />
-          </div>
+          </>
 
-          <div className='relative grid grid-cols-4 gap-2'>
+          {/* Game */}
+          <div className='relative grid grid-cols-4 gap-[2%]'>
+            {/* PlayerInfos */}
             {gameData.showPlayerInfos ? (
               <PlayerInfos
                 playerInfos={gameData.playerInfos}
@@ -238,16 +251,19 @@ const App = () => {
               />
             ) : null}
 
+            {/* Board */}
             <div className='col-span-2'>
               {gameData.showBoard ? <Board /> : null}
-              {/* {gameData.playing && <GameTimer />} */}
-              {/* {gameData.playing ? <GameTurn /> : null} */}
             </div>
 
-            {gameData.showBoard ? <ChatBox chatScope='global' /> : null}
+            {/* Chat */}
+            {gameData.showBoard ? (
+              <ChatBox chatScope={gameData.roomID} />
+            ) : null}
           </div>
         </div>
 
+        {/* footer */}
         <div className='fixed flex flex-col bottom-0'>
           <div className='flex flex-row px-8'>
             <button

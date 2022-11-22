@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
-import { socketChat } from '../service/socket'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
@@ -28,10 +27,12 @@ const Board = () => {
   }, [showTaunt])
 
   return (
-    <div className='relative flex flex-col justify-evenly m-auto max-w-[90%] aspect-square text-2xl'>
+    // rows
+    <div className='relative flex flex-col justify-between m-auto aspect-square text-2xl'>
       {gameData.roomData.board.map((row: any, i: number) => {
         return (
-          <div className='flex flex-row justify-evenly h-[15%]' key={i}>
+          // element in row
+          <div className='relative flex gap-5 justify-between' key={i}>
             {row.map((tile: any, j: number) => {
               return (
                 <Tile
@@ -67,6 +68,7 @@ const Tile = ({
   const { gameData } = useContext(GameContext)
   const [activateTaunt, setActivateTaunt] = useState<boolean>(false)
   const [transition, setTransition] = useState<boolean>(false)
+
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
@@ -75,6 +77,13 @@ const Tile = ({
         gameData.myTurn = false
       }
     }
+
+    console.log(gameData.roomData.stealthTime)
+  }
+
+  const getDistance = (from: any, to: any) => {
+    return Math.abs(from.y - to.y) + Math.abs(from.x - to.x)
+    // Math.sqrt(Math.pow(from.y - to.y, 2) + Math.pow(from.x - to.x, 2))
   }
 
   const validMove = () => {
@@ -85,8 +94,10 @@ const Tile = ({
     // player is warder
     if (gameData.role === 'warder') {
       if (
-        Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.warder_pos.y - i) > 1 ||
+        ((Math.abs(gameData.roomData.warder_pos.x - j) > 1 ||
+          Math.abs(gameData.roomData.warder_pos.y - i) > 1) &&
+          getDistance(gameData.roomData.warder_pos, { x: j, y: i }) >
+            gameData['roomData'].warder_step) ||
         tileValue === 2
       )
         return false
@@ -94,14 +105,17 @@ const Tile = ({
     // player is prisoner
     if (gameData.role === 'prisoner') {
       if (
-        Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
-        Math.abs(gameData.roomData.prisoner_pos.y - i) > 1 ||
+        ((Math.abs(gameData.roomData.prisoner_pos.x - j) > 1 ||
+          Math.abs(gameData.roomData.prisoner_pos.y - i) > 1) &&
+          getDistance(gameData.roomData.prisoner_pos, { x: j, y: i }) >
+            gameData['roomData'].prisoner_step) ||
         tileValue === 3
       )
         return false
     }
     return true
   }
+
   useEffect(() => {
     if (showTaunt === 'warder' && tileValue === 3) {
       setActivateTaunt(true)
@@ -133,22 +147,27 @@ const Tile = ({
         className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* <span className='m-auto text-xl'>Goal</span> */}
-        {/* {validMove() && <span className='dot'></span>} */}
-      </button>
+      ></button>
     )
+  // warder
   if (tileValue === 3)
     return (
       <button
-        className='tile bg-drac_red group'
+        className={`tile ${
+          gameData.options.stealth && gameData.roomData.stealthTime !== 0
+            ? `${
+                gameData.role === 'warder'
+                  ? 'bg-drac_red/50'
+                  : 'bg-drac_grey/30'
+              }`
+            : 'bg-drac_red'
+        } group`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        {/* {validMove() && <span className='dot'></span>} */}
         {activateTaunt ? (
           <img
-            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+            className={`absolute -right-20 w-20 h-20 z-50 transition ${
               transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
             }`}
             src='/taunt.png'
@@ -157,17 +176,26 @@ const Tile = ({
         ) : null}
       </button>
     )
+  // prisoner
   if (tileValue === 4)
     return (
       <button
-        className='tile bg-drac_cyan group'
+        className={`tile ${
+          gameData.options.stealth && gameData.roomData.stealthTime !== 0
+            ? `${
+                gameData.role === 'prisoner'
+                  ? 'bg-drac_cyan/50'
+                  : 'bg-drac_grey/30'
+              }`
+            : 'bg-drac_cyan'
+        } group`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
         {/* {validMove() && <span className='dot'></span>} */}
         {activateTaunt ? (
           <img
-            className={`absolute -right-20 w-20 h-20 z-50 bg-white transition ${
+            className={`absolute -right-20 w-20 h-20 z-50 transition ${
               transition ? 'scale-100 duration-500' : 'scale-0 duration-300'
             }`}
             src='/taunt.png'
@@ -175,18 +203,33 @@ const Tile = ({
           />
         ) : null}
       </button>
+    )
+  // shoes
+  if (tileValue === 5)
+    return (
+      <button
+        className='tile bg-drac_purple group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      ></button>
+    )
+
+    if (tileValue === 6)
+    return (
+      <button
+        className='tile bg-drac_yellow group'
+        disabled={!validMove()}
+        onClick={handleOnClick}
+      ></button>
     )
   //normal block
   else
     return (
       <button
-        // className='tile bg-drac_lightgrey opacity-20 group'
-        className='tile bg-drac_lightgrey opacity-70 disabled:opacity-20 group'
+        className='tile bg-drac_grey disabled:opacity-30 group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      >
-        {/* {validMove() && <span className='dot' />} */}
-      </button>
+      ></button>
     )
 }
 

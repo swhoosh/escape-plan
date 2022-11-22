@@ -13,7 +13,7 @@
 
 @layer components {
   .tile {
-    @apply relative flex aspect-square bg-drac_white text-drac_black rounded-lg shadow-md 
+    @apply relative flex-1 aspect-square bg-drac_white text-drac_black rounded-lg shadow-md 
       enabled:hover:scale-125 transition-all duration-100
   }
 
@@ -29,7 +29,7 @@
   }
 
   .input-box {
-    @apply flex grow shrink m-auto py-2 px-4 min-w-[50px] w-[100%] max-w-[200px]
+    @apply flex-1 m-auto py-2 px-4 min-w-[50px] w-[100%] max-w-[200px]
      rounded-xl focus:ring-2 focus:ring-slate-500 
      bg-drac_grey text-drac_white 
      leading-tight focus:outline-none appearance-none
@@ -37,10 +37,15 @@
   }
 
   .join-leave-button {
-    @apply flex grow w-[40%] max-w-[70px] py-2 leading-tight
+    @apply flex-1 py-2 leading-tight w-[30%] max-w-[100px]
      /* bg-drac_darkgreen hover:bg-drac_green shadow-lg shadow-drac_green/40  */
-     rounded-full text-center font-bold 
+     rounded-full text-center text-xl
      scale-90 hover:scale-100 duration-100
+  }
+
+  .chat-button {
+    @apply flex-1 leading-tight
+    bg-purple-500 rounded-xl scale-90 hover:scale-100 duration-100
   }
 }
  

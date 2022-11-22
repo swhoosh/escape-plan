@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react'
 import { GameContext } from '../App'
+import OptionsButton from './OptionsButton'
 
 import { Bubble, PopUp } from '../sounds/SoundEffect'
 
@@ -20,9 +21,27 @@ const InputRoom = () => {
     })
   }
 
-  const onKeyPress = (event: any) => {
+  // check enter
+  const handleKeyPress = (event: any) => {
     if (event.key === 'Enter' && !gameData.playing && !gameData.showBoard) {
       onJoin()
+    }
+  }
+
+  const clickSingleplayer = (difficulty: string) => {
+    const easy = difficulty === 'easy' ? true : false
+    const hard = difficulty === 'hard' ? true : false
+
+    if (name.trim().length !== 0 && roomID.trim().length !== 0) {
+      setPlayerName(name)
+      gameData.socket.emit('join_singleplayer', roomID, name,gameData.options, {
+        easy: easy,
+        hard: hard,
+      })
+    } else {
+      name.trim().length === 0
+        ? setRoomStatus('ERROR : Enter Name')
+        : setRoomStatus('ERROR : Enter Room Number')
     }
   }
 
@@ -32,7 +51,7 @@ const InputRoom = () => {
       // room num not empty
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
       setPlayerName(name)
-      gameData.socket.emit('join_room', roomID, name, gameData.socket.id)
+      gameData.socket.emit('join_room', roomID, name, gameData.options)
     } else {
       name.trim().length === 0
         ? setRoomStatus('ERROR : Enter Name')
@@ -61,7 +80,7 @@ const InputRoom = () => {
 
   return (
     <div
-      className={`flex w-1/2 m-auto gap-2 
+      className={`flex w-1/2 mb-[2%] m-auto gap-2  
       ${gameData.roomID ? 'flex-row' : 'flex-col items-center'}`}
     >
       {!gameData.playing ? (
@@ -70,6 +89,7 @@ const InputRoom = () => {
           type='text'
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder='Enter your name'
         />
       ) : null}
@@ -80,21 +100,58 @@ const InputRoom = () => {
           type='number'
           value={roomID}
           onChange={(e) => setRoomID(e.target.value)}
-          onKeyPress={onKeyPress}
+          onKeyPress={handleKeyPress}
           placeholder='Room Number'
         />
       ) : null}
 
       {!gameData.roomID && (
-        <button
-          className={`join-leave-button  bg-drac_darkgreen
+        <>
+          <button
+            className={`join-leave-button  bg-drac_darkgreen
            shadow-lg shadow-drac_green/40
-           hover:scale-125 hover:rounded-xl transition-all duration-100
+           hover:scale-120 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={() => {onJoin(); Bubble();}}
-        >
-          <div className='m-auto'>join</div>
-        </button>
+            onClick={() => {onJoin(); Bubble();}}
+          >
+            <div className='m-auto'>join</div>
+          </button>
+          <OptionsButton />
+        </>
+      )}
+
+      {!gameData.roomID && (
+        <>
+          <button
+            className={`join-leave-button  bg-drac_darkgreen
+           shadow-lg shadow-drac_green/40
+           hover:scale-120 hover:rounded-xl transition-all duration-100
+          ${gameData.roomID ? null : 'mt-3'} `}
+            onClick={() => clickSingleplayer('easy')}
+          >
+            <div className='m-auto'>easy</div>
+          </button>
+          <div className='hidden'>
+            <OptionsButton />
+          </div>
+        </>
+      )}
+
+      {!gameData.roomID && (
+        <>
+          <button
+            className={`join-leave-button  bg-drac_red
+           shadow-lg shadow-drac_red/40
+           hover:scale-120 hover:rounded-xl transition-all duration-100
+          ${gameData.roomID ? null : 'mt-3'} `}
+            onClick={() => clickSingleplayer('hard')}
+          >
+            <div className='m-auto'>hard</div>
+          </button>
+          <div className='hidden'>
+            <OptionsButton />
+          </div>
+        </>
       )}
 
       {gameData.roomID && !gameData.playing ? (

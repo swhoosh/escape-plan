@@ -1,7 +1,8 @@
+import { useContext } from 'react'
 import { RiVipCrownFill } from 'react-icons/ri'
 import GameTimer from './GameTimer'
 import GameTurn from './GameTurn'
-
+import { GameContext } from '../App'
 const PlayerInfos = ({
   playerInfos,
   role,
@@ -18,17 +19,19 @@ const PlayerInfos = ({
   if (playerInfos.length > 1) {
     playerInfos[1]['role'] = role === 'warder' ? 'prisoner' : 'warder'
   }
+  
+  const { gameData } = useContext(GameContext)
 
   return (
     <div className='relative flex flex-col h-[100%]'>
       {/* slide pane */}
       {playing ? (
         <div
-          className={`absolute w-full h-[60%] bg-slate-50/10 
+          className={`absolute w-full h-[50%] bg-slate-50/10 
         ${
-          myTurn ? 'translate-y-[0]' : 'translate-y-[60%]'
+          myTurn ? 'translate-y-[0]' : 'translate-y-full'
         } transition-all duration-300`}
-        ></div>
+        />
       ) : null}
 
       {/* playerInfos container */}
@@ -44,9 +47,15 @@ const PlayerInfos = ({
                 <span>{playerInfos[0].score}</span>
                 <RiVipCrownFill size={25} color='yellow' />
               </div>
-              <div className='m-auto text-[2vh] text-center text-drac_white/80'>
+              <div className='m-auto text-[2vh] text-center text-drac_white/80'> 
                 {playerInfos[0].role}
               </div>
+              {gameData.roomData.haveKey == playerInfos[0].role && <img
+            className={`absolute right-11 bottom-0 w-20 h-20 z-50 transition`}
+            style={{top:'150px',height:'60px'}}
+            src='/key.png'
+            alt=''
+          />}
             </div>
           </div>
         ) : null}
@@ -67,6 +76,12 @@ const PlayerInfos = ({
               <div className='m-auto text-[2vh] text-center text-drac_white/80'>
                 {playerInfos[1].role}
               </div>
+              {gameData.roomData.haveKey == playerInfos[1].role && <img
+            className={`absolute right-11 w-20 h-20 z-50 transition`}
+            style={{top:'400px',height:'60px'}}
+            src='/key.png'
+            alt=''
+          />}
             </div>
           </div>
         ) : null}
