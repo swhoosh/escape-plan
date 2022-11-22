@@ -2,9 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
 import { socketChat } from '../service/socket'
-import { Click } from '../sounds/SoundEffect'
 
-const Board = (props: any) => {
+const Board = () => {
   const { gameData } = useContext(GameContext)
   const [showTaunt, setShowTaunt] = useState<string>('')
 
@@ -42,7 +41,6 @@ const Board = (props: any) => {
                   j={j}
                   myTurn={gameData.myTurn}
                   showTaunt={showTaunt}
-                  sound={props.sound}
                 />
               )
             })}
@@ -59,14 +57,12 @@ const Tile = ({
   j,
   myTurn,
   showTaunt,
-  sound,
 }: {
   tileValue: number
   i: number
   j: number
   myTurn: boolean
   showTaunt: string
-  sound: boolean
 }) => {
   const { gameData } = useContext(GameContext)
   const [activateTaunt, setActivateTaunt] = useState<boolean>(false)
@@ -77,7 +73,6 @@ const Tile = ({
         gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
         // console.log('LETS GOOOO')
         gameData.myTurn = false
-        Click(sound)
       }
     }
   }

@@ -3,7 +3,7 @@ import { GameContext } from '../App'
 
 import { Bubble, PopUp } from '../sounds/SoundEffect'
 
-const InputRoom = (props: any) => {
+const InputRoom = () => {
   const { gameData, setGameData } = useContext(GameContext)
   const [name, setName] = useState('')
   const [roomID, setRoomID] = useState('')
@@ -28,7 +28,6 @@ const InputRoom = (props: any) => {
 
   // Join Room
   const onJoin = () => {
-    Bubble(props.sound)
     if (name.trim().length !== 0 && roomID.trim().length !== 0) {
       // room num not empty
       // console.log(`[CLIENT] joinRoom : ${roomID}`)
@@ -92,7 +91,7 @@ const InputRoom = (props: any) => {
            shadow-lg shadow-drac_green/40
            hover:scale-125 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={() => {onJoin(); Bubble(props.sound);}}
+          onClick={() => {onJoin(); Bubble();}}
         >
           <div className='m-auto'>join</div>
         </button>
@@ -102,7 +101,7 @@ const InputRoom = (props: any) => {
         <button
           className={`join-leave-button bg-drac_red 
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={() => {onLeave(); PopUp(props.sound);}}
+          onClick={() => {onLeave(); PopUp();}}
         >
           <div className='m-auto'>leave</div>
         </button>

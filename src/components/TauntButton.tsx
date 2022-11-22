@@ -3,7 +3,7 @@ import { GameContext } from '../App'
 import { RiEmotionFill } from 'react-icons/ri'
 import { Minion } from '../sounds/SoundEffect'
 
-export default function TauntButton(props: any) {
+export default function TauntButton() {
   const { gameData } = useContext(GameContext)
 
   const handleOnClick = () => {
@@ -13,7 +13,7 @@ export default function TauntButton(props: any) {
   }
   return (
     <button
-      onClick={() => {handleOnClick(); Minion(props.sound);}}
+      onClick={() => {handleOnClick(); Minion();}}
       className='join-leave-button w-[25%] bg-purple-500 rounded-xl'
     >
       <div className='m-auto'>

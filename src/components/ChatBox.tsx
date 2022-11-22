@@ -6,12 +6,11 @@ import TauntButton from './TauntButton'
 import { Drum } from '../sounds/SoundEffect'
 
 type ChatBoxProps = {
-  sound: boolean
   chatScope: string
   chatPeriod?: string | Date
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ sound, chatScope, chatPeriod }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({ chatScope, chatPeriod }) => {
   const { gameData } = useContext(GameContext)
 
   const [chatData, setChatData] = useState({
@@ -128,7 +127,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ sound, chatScope, chatPeriod }) => {
         {chat()}
       </div>
 
-      <ChatInput sound={sound} chatScope={chatScope} />
+      <ChatInput chatScope={chatScope} />
     </div>
   )
 }
@@ -140,9 +139,8 @@ ChatBox.defaultProps = {
 
 type ChatInputProps = {
   chatScope: string
-  sound: boolean
 }
-const ChatInput: React.FC<ChatInputProps> = ({ sound, chatScope }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
   const [message, setMessage] = useState('')
 
   const onKeyPress = (event: any) => {
@@ -171,12 +169,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ sound, chatScope }) => {
 
       <button
         className='join-leave-button w-[25%] rounded-xl bg-drac_pink'
-        onClick={() => {sendMessage(); Drum(sound);}}
+        onClick={() => {sendMessage(); Drum();}}
       >
         <div className='m-auto text-[2vh]'>send</div>
       </button>
 
-      <TauntButton sound={sound}/>
+      <TauntButton />
     </div>
   )
 }
