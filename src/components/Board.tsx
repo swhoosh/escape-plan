@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
+import { ClickTile } from '../sounds/SoundEffect'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
@@ -73,6 +74,7 @@ const Tile = ({
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
+        ClickTile()
         gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
         // console.log('LETS GOOOO')
         gameData.myTurn = false
