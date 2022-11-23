@@ -161,7 +161,7 @@ const Tile = ({
             ? `${
                 gameData.role === 'warder'
                   ? 'bg-drac_red/50'
-                  : 'bg-drac_grey/30'
+                  : 'bg-drac_grey disabled:opacity-30'
               }`
             : 'bg-drac_red'
         } group`}
@@ -215,7 +215,7 @@ const Tile = ({
             ? `${
                 gameData.role === 'prisoner'
                   ? 'bg-drac_cyan/50'
-                  : 'bg-drac_grey/30'
+                  : 'bg-drac_grey disabled:opacity-30'
               }`
             : 'bg-drac_cyan'
         } group`}
