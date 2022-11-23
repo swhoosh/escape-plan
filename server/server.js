@@ -499,6 +499,8 @@ const skipTurn = (roomID) => {
 
 const handle_leave_room = (roomID, socketID) => {
   // if there is no roomID in all_rooms do nothing
+  if (all_rooms[roomID] === undefined) return
+
   const isSingleplayer = all_rooms[roomID].singleplayer
 
   if (!(roomID in all_rooms)) return
@@ -553,6 +555,7 @@ const resetRoom = (roomID) => {
 const reMatch = (roomID) => {
   if (!(roomID in all_rooms)) return
   if (n_sockets_in_room(roomID) !== 2) return
+  startRoom(roomID)
   io.to(roomID).emit('update_showResult', false)
   return
 }
