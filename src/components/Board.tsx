@@ -150,7 +150,13 @@ const Tile = ({
         className='tile bg-drac_darkgreen group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      ></button>
+      >
+        <img
+          className={`absolute top-0`}
+          src='/tunnel.png'
+          alt='tunnel'
+        />
+      </button>
     )
   // warder
   if (tileValue === 3)
