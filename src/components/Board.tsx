@@ -272,7 +272,13 @@ const Tile = ({
         className='tile bg-drac_purple group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      ></button>
+      >
+        <img
+          className={`absolute top-0`}
+          src='/shoe.png'
+          alt='shoe'
+        />
+      </button>
     )
 
   if (tileValue === 6)
