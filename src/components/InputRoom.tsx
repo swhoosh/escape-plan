@@ -129,39 +129,40 @@ const InputRoom = () => {
         </>
       )}
 
-      {!gameData.roomID && (
-        <>
-          <button
-            className={`join-leave-button  bg-drac_darkgreen
+      <div className='mt-5'>VS AI</div>
+      <div className='flex-row'>
+        {!gameData.roomID && (
+          <>
+            <button
+              className={`join-leave-button w-[100%]  bg-drac_darkgreen
            shadow-lg shadow-drac_green/40
-           hover:scale-120 hover:rounded-xl transition-all duration-100
-          ${gameData.roomID ? null : 'mt-3'} `}
-            onClick={() => clickSingleplayer('easy')}
-          >
-            <div className='m-auto'>easy</div>
-          </button>
-          <div className='hidden'>
-            <OptionsButton />
-          </div>
-        </>
-      )}
+           hover:scale-120 hover:rounded-xl transition-all duration-100`}
+              onClick={() => clickSingleplayer('easy')}
+            >
+              <div className='m-auto'>easy</div>
+            </button>
+            <div className='hidden'>
+              <OptionsButton />
+            </div>
+          </>
+        )}
 
-      {!gameData.roomID && (
-        <>
-          <button
-            className={`join-leave-button  bg-drac_red
+        {!gameData.roomID && (
+          <>
+            <button
+              className={`join-leave-button w-[100%] bg-drac_red
            shadow-lg shadow-drac_red/40
-           hover:scale-120 hover:rounded-xl transition-all duration-100
-          ${gameData.roomID ? null : 'mt-3'} `}
-            onClick={() => clickSingleplayer('hard')}
-          >
-            <div className='m-auto'>hard</div>
-          </button>
-          <div className='hidden'>
-            <OptionsButton />
-          </div>
-        </>
-      )}
+           hover:scale-120 hover:rounded-xl transition-all duration-100`}
+              onClick={() => clickSingleplayer('hard')}
+            >
+              <div className='m-auto'>hard</div>
+            </button>
+            <div className='hidden'>
+              <OptionsButton />
+            </div>
+          </>
+        )}
+      </div>
 
       {gameData.roomID && !gameData.playing ? (
         <button

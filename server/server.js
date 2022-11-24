@@ -539,7 +539,9 @@ const startRoom = (roomID) => {
     all_rooms[roomID]['gameOptions']
   )
 
-  botMove(roomID)
+  if (all_rooms[roomID].singleplayer) {
+    botMove(roomID)
+  }
 }
 
 const resetScore = (roomID) => {
