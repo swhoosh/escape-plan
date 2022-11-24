@@ -161,13 +161,40 @@ const Tile = ({
             ? `${
                 gameData.role === 'warder'
                   ? 'bg-drac_red/50'
-                  : 'bg-drac_grey/30'
+                  : 'bg-drac_grey disabled:opacity-30'
               }`
             : 'bg-drac_red'
         } group`}
+        // style={{background:'url(warder.png)'}} // don't wok idk why
         disabled={!validMove()}
         onClick={handleOnClick}
       >
+        {/* normal */}
+        {!gameData.options.stealth &&
+          <img
+            className={`absolute top-0`}
+            src='/warder.png'
+            alt='warder'
+          />
+        }
+        {/* invis */}
+        {gameData.options.stealth && gameData.roomData.stealthTime !== 0 && gameData.role === 'warder' &&
+          <img
+            className={`absolute top-0`}
+            style={{opacity:'50%'}}
+            src='/warder.png'
+            alt='warder'
+          />
+        }
+        {/* not invis */}
+        {gameData.options.stealth && gameData.roomData.stealthTime == 0 &&
+          <img
+            className={`absolute top-0`}
+            src='/warder.png'
+            alt='warder'
+          />
+        }
+
         {activateTaunt ? (
           <img
             className={`absolute -right-20 w-20 h-20 z-50 transition ${
@@ -188,13 +215,38 @@ const Tile = ({
             ? `${
                 gameData.role === 'prisoner'
                   ? 'bg-drac_cyan/50'
-                  : 'bg-drac_grey/30'
+                  : 'bg-drac_grey disabled:opacity-30'
               }`
             : 'bg-drac_cyan'
         } group`}
         disabled={!validMove()}
         onClick={handleOnClick}
       >
+        {/* normal */}
+        {!gameData.options.stealth &&
+          <img
+            className={`absolute top-0`}
+            src='/prisoner.png'
+            alt='prisoner'
+          />
+        }
+        {/* invis */}
+        {gameData.options.stealth && gameData.roomData.stealthTime !== 0 && gameData.role === 'prisoner' &&
+          <img
+            className={`absolute top-0`}
+            style={{opacity:'50%'}}
+            src='/prisoner.png'
+            alt='prisoner'
+          />
+        }
+        {/* not invis */}
+        {gameData.options.stealth && gameData.roomData.stealthTime == 0 &&
+          <img
+            className={`absolute top-0`}
+            src='/prisoner.png'
+            alt='prisoner'
+          />
+        }
         {/* {validMove() && <span className='dot'></span>} */}
         {activateTaunt ? (
           <img
@@ -223,7 +275,13 @@ const Tile = ({
         className='tile bg-drac_yellow group'
         disabled={!validMove()}
         onClick={handleOnClick}
-      ></button>
+      >
+        <img
+          className={`absolute top-0`}
+          src='/key.png'
+          alt='key'
+        />
+      </button>
     )
   //normal block
   else
