@@ -6,37 +6,44 @@ import popUpSFX from './pop-up.mp3'
 import searchingSFX from './searching.mp3'
 import clickSFX from './click.mp3'
 
-export const ClickTile = () => {
+export const ClickTile = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(clickSFX)
   music.play()
 }
 
-export const Bubble = () => {
+export const Bubble = (isMute: any) => {
+  if (isMute) return
   const bubble = new Audio(bubbleSFX)
   bubble.play()
 }
 
-export const Drum = () => {
+export const Drum = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(drumSFX)
   music.play()
 }
 
-export const Minion = () => {
+export const Minion = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(minionSFX)
   music.play()
 }
 
-export const PopUpOn = () => {
+export const PopUpOn = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(popUpOnSFX)
   music.play()
 }
 
-export const PopUp = () => {
+export const PopUp = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(popUpSFX)
   music.play()
 }
 
-export const searching = () => {
+export const searching = (isMute: any) => {
+  if (isMute) return
   const music = new Audio(searchingSFX)
   music.play()
 }

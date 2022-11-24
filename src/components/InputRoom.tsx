@@ -34,10 +34,16 @@ const InputRoom = () => {
 
     if (name.trim().length !== 0 && roomID.trim().length !== 0) {
       setPlayerName(name)
-      gameData.socket.emit('join_singleplayer', roomID, name,gameData.options, {
-        easy: easy,
-        hard: hard,
-      })
+      gameData.socket.emit(
+        'join_singleplayer',
+        roomID,
+        name,
+        gameData.options,
+        {
+          easy: easy,
+          hard: hard,
+        }
+      )
     } else {
       name.trim().length === 0
         ? setRoomStatus('ERROR : Enter Name')
@@ -112,7 +118,10 @@ const InputRoom = () => {
            shadow-lg shadow-drac_green/40
            hover:scale-120 hover:rounded-xl transition-all duration-100
           ${gameData.roomID ? null : 'mt-3'} `}
-            onClick={() => {onJoin(); Bubble();}}
+            onClick={() => {
+              onJoin()
+              Bubble(gameData.isMute)
+            }}
           >
             <div className='m-auto'>join</div>
           </button>
@@ -158,7 +167,10 @@ const InputRoom = () => {
         <button
           className={`join-leave-button bg-drac_red 
           ${gameData.roomID ? null : 'mt-3'} `}
-          onClick={() => {onLeave(); PopUp();}}
+          onClick={() => {
+            onLeave()
+            PopUp(gameData.isMute)
+          }}
         >
           <div className='m-auto'>leave</div>
         </button>

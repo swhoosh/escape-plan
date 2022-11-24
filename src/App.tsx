@@ -31,10 +31,18 @@ const App = () => {
     playerInfos: {},
     showResult: false,
     result: '',
+    isMute: false,
   })
 
   const [sound, setSound] = useState(true)
   const [soundText, setSoundText] = useState('mute')
+
+  useEffect(() => {
+    setGameData((prevGameData) => ({
+      ...prevGameData,
+      isMute: sound,
+    }))
+  }, [sound])
 
   const handleMuteButton = () => {
     setSound(!sound)
@@ -264,12 +272,12 @@ const App = () => {
         {/* footer */}
         <div className='fixed flex flex-col bottom-0'>
           <div className='flex flex-row px-8'>
-            {/* <button
+            <button
               className='m-auto py-1 px-2 rounded-full leading-tight bg-amber-500 hover:bg-amber-600 font-bold'
               onClick={onLog}
             >
               LOG gameData
-            </button> */}
+            </button>
             <button
               className='m-auto py-1 px-2 rounded-full leading-tight bg-green-500 hover:bg-amber-600 font-bold'
               onClick={handleMuteButton}
