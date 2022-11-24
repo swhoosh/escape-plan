@@ -549,6 +549,7 @@ const resetRoom = (roomID) => {
   if (n_sockets_in_room(roomID) !== 2) return 'game not start yet'
   resetScore(roomID)
   startRoom(roomID)
+  io.to(roomID).emit('update_showResult', false)
   return `reset room ${roomID} successful`
 }
 
