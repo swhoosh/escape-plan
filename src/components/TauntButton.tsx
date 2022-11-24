@@ -12,7 +12,12 @@ export default function TauntButton() {
     }
   }
   return (
-    <button onClick={() => {handleOnClick(); Minion();}} className='chat-button max-w-[40px]'>
+    <button
+      onClick={() => {
+        handleOnClick()
+      }}
+      className='chat-button max-w-[40px]'
+    >
       <div className='w-[20px] m-auto'>
         <RiEmotionFill size={20} color='white' />
       </div>

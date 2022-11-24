@@ -153,11 +153,12 @@ type ChatInputProps = {
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
+  const { gameData } = useContext(GameContext)
   const [message, setMessage] = useState('')
 
   const onKeyPress = (event: any) => {
     if (event.key === 'Enter') {
-      Drum()
+      Drum(gameData.isMute)
       sendMessage()
     }
   }
@@ -184,7 +185,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ chatScope }) => {
         className='chat-button max-w-[60px] rounded-xl bg-drac_pink'
         onClick={() => {
           sendMessage()
-          Drum()
+          Drum(gameData.isMute)
         }}
       >
         <div className='m-auto text-[2vh]'>send</div>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import { GameContext } from '../App'
-import { ClickTile } from '../sounds/SoundEffect'
+import { ClickTile, Minion } from '../sounds/SoundEffect'
 
 const Board = () => {
   const { gameData } = useContext(GameContext)
@@ -10,6 +10,8 @@ const Board = () => {
   useEffect(() => {
     if (gameData.socket !== undefined) {
       gameData.socket.on('taunt_display', (id: number) => {
+        Minion(gameData.isMute)
+
         const newTaunt =
           gameData.roomData.warder === id
             ? 'warder'
@@ -74,7 +76,7 @@ const Tile = ({
   const handleOnClick = () => {
     if (gameData.socket !== undefined) {
       if (gameData.myTurn) {
-        ClickTile()
+        ClickTile(gameData.isMute)
         gameData.socket.emit('clicked_tile', gameData.roomID, j, i)
         // console.log('LETS GOOOO')
         gameData.myTurn = false
@@ -151,11 +153,7 @@ const Tile = ({
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        <img
-          className={`absolute top-0`}
-          src='/tunnel.png'
-          alt='tunnel'
-        />
+        <img className={`absolute top-0`} src='/tunnel.png' alt='tunnel' />
       </button>
     )
   // warder
@@ -176,30 +174,24 @@ const Tile = ({
         onClick={handleOnClick}
       >
         {/* normal */}
-        {!gameData.options.stealth &&
-          <img
-            className={`absolute top-0`}
-            src='/warder.png'
-            alt='warder'
-          />
-        }
+        {!gameData.options.stealth && (
+          <img className={`absolute top-0`} src='/warder.png' alt='warder' />
+        )}
         {/* invis */}
-        {gameData.options.stealth && gameData.roomData.stealthTime !== 0 && gameData.role === 'warder' &&
-          <img
-            className={`absolute top-0`}
-            style={{opacity:'50%'}}
-            src='/warder.png'
-            alt='warder'
-          />
-        }
+        {gameData.options.stealth &&
+          gameData.roomData.stealthTime !== 0 &&
+          gameData.role === 'warder' && (
+            <img
+              className={`absolute top-0`}
+              style={{ opacity: '50%' }}
+              src='/warder.png'
+              alt='warder'
+            />
+          )}
         {/* not invis */}
-        {gameData.options.stealth && gameData.roomData.stealthTime == 0 &&
-          <img
-            className={`absolute top-0`}
-            src='/warder.png'
-            alt='warder'
-          />
-        }
+        {gameData.options.stealth && gameData.roomData.stealthTime == 0 && (
+          <img className={`absolute top-0`} src='/warder.png' alt='warder' />
+        )}
 
         {activateTaunt ? (
           <img
@@ -229,30 +221,32 @@ const Tile = ({
         onClick={handleOnClick}
       >
         {/* normal */}
-        {!gameData.options.stealth &&
+        {!gameData.options.stealth && (
           <img
             className={`absolute top-0`}
             src='/prisoner.png'
             alt='prisoner'
           />
-        }
+        )}
         {/* invis */}
-        {gameData.options.stealth && gameData.roomData.stealthTime !== 0 && gameData.role === 'prisoner' &&
-          <img
-            className={`absolute top-0`}
-            style={{opacity:'50%'}}
-            src='/prisoner.png'
-            alt='prisoner'
-          />
-        }
+        {gameData.options.stealth &&
+          gameData.roomData.stealthTime !== 0 &&
+          gameData.role === 'prisoner' && (
+            <img
+              className={`absolute top-0`}
+              style={{ opacity: '50%' }}
+              src='/prisoner.png'
+              alt='prisoner'
+            />
+          )}
         {/* not invis */}
-        {gameData.options.stealth && gameData.roomData.stealthTime == 0 &&
+        {gameData.options.stealth && gameData.roomData.stealthTime == 0 && (
           <img
             className={`absolute top-0`}
             src='/prisoner.png'
             alt='prisoner'
           />
-        }
+        )}
         {/* {validMove() && <span className='dot'></span>} */}
         {activateTaunt ? (
           <img
@@ -273,11 +267,7 @@ const Tile = ({
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        <img
-          className={`absolute top-0`}
-          src='/shoe.png'
-          alt='shoe'
-        />
+        <img className={`absolute top-0`} src='/shoe.png' alt='shoe' />
       </button>
     )
 
@@ -288,11 +278,7 @@ const Tile = ({
         disabled={!validMove()}
         onClick={handleOnClick}
       >
-        <img
-          className={`absolute top-0`}
-          src='/key.png'
-          alt='key'
-        />
+        <img className={`absolute top-0`} src='/key.png' alt='key' />
       </button>
     )
   //normal block

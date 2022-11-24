@@ -34,7 +34,7 @@ const App = () => {
     isMute: false,
   })
 
-  const [sound, setSound] = useState(true)
+  const [sound, setSound] = useState(false)
   const [soundText, setSoundText] = useState('mute')
 
   useEffect(() => {
