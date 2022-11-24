@@ -526,8 +526,7 @@ const handle_leave_room = (roomID, socketID) => {
 }
 
 const startRoom = (roomID) => {
-  let roomData = generateNewRoomData(roomID)
-
+  let roomData = all_rooms[roomID]['singleplayer'] ? generateNewRoomDataSingleplayer(roomID) : generateNewRoomData(roomID)
   io.to(roomID).emit('game_start', roomData, all_rooms[roomID]['playerInfos'])
 
   timerIntervalId[roomID] = gameTimer(
@@ -537,6 +536,8 @@ const startRoom = (roomID) => {
     skipTurn,
     all_rooms[roomID]['gameOptions']
   )
+
+  botMove(roomID)
 }
 
 const resetScore = (roomID) => {
@@ -907,9 +908,10 @@ io.on('connection', (socket) => {
       all_rooms[roomID]['playerInfos'] = all_rooms[roomID]['playerInfos'].map(
         (playerInfo) => ({
           ...playerInfo,
-          reMatch: false,
+          reMatch: (playerInfo['name'] == 'NoobBot' || playerInfo['name'] == 'DoomBot') && all_rooms[roomID]['singleplayer'] ? true : false,
         })
       )
+
     }
   })
 
