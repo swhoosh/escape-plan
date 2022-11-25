@@ -129,7 +129,7 @@ const InputRoom = () => {
         </>
       )}
 
-      <div className='mt-5'>VS AI</div>
+      {!gameData.roomID && <div className='mt-5'>VS AI</div>}
       <div className='flex-row'>
         {!gameData.roomID && (
           <>
